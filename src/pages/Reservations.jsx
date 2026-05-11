@@ -274,7 +274,7 @@ export default function Reservations() {
           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
         >
           <Plus className="w-5 h-5" />
-          Nueva Reservación
+          Reservar
         </button>
       </div>
 
@@ -338,22 +338,22 @@ export default function Reservations() {
                   : 'border-gray-200 dark:border-gray-700'
               }`}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-gray-900 dark:text-white">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="font-bold text-gray-900 dark:text-white shrink-0">
                       {reservation.quantity}x
                     </span>
-                    <span className="text-gray-900 dark:text-white">
+                    <span className="text-gray-900 dark:text-white truncate">
                       {reservation.flavors?.name}
                     </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       ({reservation.flavors?.models?.name})
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      Cliente: <strong className="text-gray-900 dark:text-white">{reservation.customer_name}</strong>
+                      <strong className="text-gray-900 dark:text-white">{reservation.customer_name}</strong>
                     </span>
                     <span className={`font-medium ${
                       isOverdue(reservation.delivery_date)
@@ -368,7 +368,7 @@ export default function Reservations() {
                     </span>
                   </div>
                   {reservation.notes && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
                       {reservation.notes}
                     </p>
                   )}
@@ -376,7 +376,7 @@ export default function Reservations() {
                     Por: {reservation.reserved_by?.split('@')[0]}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => handleDeliver(reservation)}
                     className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
@@ -403,7 +403,7 @@ export default function Reservations() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Nueva Reservación</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Reservar</h2>
               <button
                 onClick={() => { setShowModal(false); resetForm() }}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
