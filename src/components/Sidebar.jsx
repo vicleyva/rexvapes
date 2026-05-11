@@ -37,15 +37,15 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
   const SidebarContent = ({ isCollapsed = false, showCollapseBtn = false }) => (
     <>
       {/* Logo */}
-      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-2' : 'p-4'}`}>
+      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-1' : 'p-0'}`}>
         <Link to="/dashboard" className="flex flex-col items-center">
           <img
             src={import.meta.env.BASE_URL + "logo.png"}
             alt="Rex Vapes"
-            className={`object-contain ${isCollapsed ? 'w-14 h-14' : 'w-44 h-44'}`}
+            className={`object-contain ${isCollapsed ? 'w-18 h-18' : 'w-64 h-auto'}`}
           />
           {!isCollapsed && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Admin Panel</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">Admin Panel</p>
           )}
         </Link>
       </div>
