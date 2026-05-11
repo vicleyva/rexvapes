@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
-  Wind,
   LayoutDashboard,
   Package,
   ShoppingCart,
@@ -38,9 +37,13 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
   const SidebarContent = ({ isCollapsed = false, showCollapseBtn = false }) => (
     <>
       {/* Logo */}
-      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-4' : 'p-6'}`}>
+      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-3' : 'p-4'}`}>
         <Link to="/dashboard" className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-          <Wind className={`text-blue-500 dark:text-blue-400 ${isCollapsed ? 'w-8 h-8' : 'w-10 h-10'}`} />
+          <img
+            src="/logo.png"
+            alt="Rex Vapes"
+            className={`rounded-lg ${isCollapsed ? 'w-12 h-12' : 'w-14 h-14'}`}
+          />
           {!isCollapsed && (
             <div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
@@ -128,7 +131,7 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <Wind className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+          <img src="/logo.png" alt="Rex Vapes" className="w-10 h-10 rounded-lg" />
           <span className="text-lg font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
             REXVAPES
           </span>

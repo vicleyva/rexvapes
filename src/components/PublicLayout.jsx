@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Wind, LogIn, Moon, Sun } from 'lucide-react'
+import { LogIn, Moon, Sun } from 'lucide-react'
 
 export default function PublicLayout({ children }) {
   const [darkMode, setDarkMode] = useState(() => {
@@ -23,7 +23,7 @@ export default function PublicLayout({ children }) {
       <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Wind className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            <img src="/logo.png" alt="Rex Vapes" className="w-10 h-10 rounded-lg" />
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               REXVAPES
             </span>

@@ -21,36 +21,44 @@ Inventory & sales tracking app for vape shop.
 ## Project Structure
 
 ```
-src/
-├── components/          # Reusable UI components
-│   ├── AvailabilityCard.jsx
-│   ├── FlavorCard.jsx
-│   ├── Layout.jsx       # Protected pages layout (sidebar)
-│   ├── LowStockAlert.jsx
-│   ├── ModelSelector.jsx
-│   ├── Navbar.jsx
-│   ├── PublicLayout.jsx # Public pages layout
-│   ├── RestockModal.jsx
-│   ├── SaleModal.jsx
-│   └── Sidebar.jsx
-├── context/
-│   └── AuthContext.jsx  # Supabase auth state
-├── lib/
-│   └── supabase.js      # Supabase client init
-├── pages/
-│   ├── public/
-│   │   └── Availability.jsx  # Public stock check (/)
-│   ├── Dashboard.jsx    # KPIs overview
-│   ├── History.jsx      # Transaction history
-│   ├── Inventory.jsx    # Stock management
-│   ├── Login.jsx        # Auth page
-│   ├── Reports.jsx      # Analytics
-│   ├── Sales.jsx        # Record sales
-│   └── Settings.jsx     # Models & flavors config
-├── App.jsx              # Routes + ProtectedRoute
-├── App.css
-├── index.css            # Tailwind imports
-└── main.jsx             # Entry point
+rexvapes/
+├── public/
+│   └── 404.html         # GitHub Pages SPA redirect
+├── src/
+│   ├── components/
+│   │   ├── AvailabilityCard.jsx
+│   │   ├── FlavorCard.jsx
+│   │   ├── Layout.jsx       # Protected layout (sidebar + dark mode)
+│   │   ├── LowStockAlert.jsx
+│   │   ├── ModelSelector.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── PublicLayout.jsx # Public layout (dark mode)
+│   │   ├── RestockModal.jsx
+│   │   ├── SaleModal.jsx    # Internal use + discount features
+│   │   └── Sidebar.jsx      # Collapsible sidebar
+│   ├── context/
+│   │   └── AuthContext.jsx  # Supabase auth state
+│   ├── lib/
+│   │   └── supabase.js      # Supabase client init
+│   ├── pages/
+│   │   ├── public/
+│   │   │   └── Availability.jsx  # Public stock check (/)
+│   │   ├── Dashboard.jsx    # KPIs overview
+│   │   ├── History.jsx      # Transaction history (default today)
+│   │   ├── Inventory.jsx    # Stock management + filters
+│   │   ├── Login.jsx        # Auth page (dark mode)
+│   │   ├── Reports.jsx      # Analytics
+│   │   ├── Sales.jsx        # Record sales
+│   │   └── Settings.jsx     # Models & flavors config
+│   ├── App.jsx              # Routes + ProtectedRoute
+│   ├── App.css
+│   ├── index.css            # Tailwind + dark mode variant
+│   └── main.jsx             # Entry point
+├── .github/
+│   └── workflows/
+│       └── deploy.yml       # GitHub Pages deployment
+├── index.html               # SPA redirect handler script
+└── package.json             # homepage: GitHub Pages URL
 ```
 
 ---
@@ -111,12 +119,21 @@ npm run dev
 # Build
 npm run build
 
-# Deploy to GitHub Pages
-npm run deploy
+# Preview build
+npm run preview
 
 # Lint
 npm run lint
+
+# Fix package-lock.json sync issues
+rm -rf node_modules package-lock.json && npm install
 ```
+
+## Git
+
+- **Branch**: `master`
+- **Remote**: `https://github.com/vicleyva/rexvapes.git`
+- **Live URL**: `https://vicleyva.github.io/rexvapes`
 
 ---
 
@@ -129,10 +146,76 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ---
 
+## Dark Mode (Tailwind v4)
+
+**CRITICAL**: Tailwind CSS v4 uses media query for dark mode by default. To enable class-based toggling:
+
+```css
+/* src/index.css */
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+```
+
+This allows `document.documentElement.classList.add('dark')` to work properly.
+
+---
+
+## GitHub Pages Deployment
+
+### Setup
+
+1. **Repository Settings** → Pages → Source: GitHub Actions
+2. **Secrets** (Settings → Secrets → Actions):
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+
+### Security Note
+
+The Supabase anon key is **public by design** - it's embedded in the built JS. Security comes from Row Level Security (RLS) policies, not the key itself.
+
+### Workflow
+
+File: `.github/workflows/deploy.yml`
+- Triggers on push to `master` branch
+- Uses secrets for environment variables
+- Deploys to GitHub Pages
+
+### SPA 404 Fix
+
+GitHub Pages doesn't understand client-side routes. When user refreshes `/dashboard`, GitHub returns 404.
+
+**Solution**: Two-file redirect pattern:
+
+**`public/404.html`** - Catches 404 and redirects with path in query string:
+```javascript
+var l = window.location;
+l.replace(
+  l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+  l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+  l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+  (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+  l.hash
+);
+```
+
+**`index.html`** - Script in `<head>` restores the path:
+```javascript
+if (l.search[1] === '/' ) {
+  var decoded = l.search.slice(1).split('&').map(function(s) {
+    return s.replace(/~and~/g, '&')
+  }).join('?');
+  window.history.replaceState(null, null,
+    l.pathname.slice(0, -1) + decoded + l.hash
+  );
+}
+```
+
+---
+
 ## UI Patterns
 
 - **Language**: Spanish (Ventas, Inventario, Sabores, etc.)
-- **Dark mode**: Supported via Tailwind (`dark:` classes)
+- **Dark mode**: Class-based via `dark:` classes (see Dark Mode section)
 - **Colors**: Blue/Purple primary, standard status colors
 - **Cards**: `rounded-xl border border-gray-200 dark:border-gray-700`
 - **Buttons**: `rounded-xl` with hover transitions
@@ -146,6 +229,11 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 3. **Sales Recording** - Select flavor, quantity, auto-calculate total
 4. **Restock Tracking** - Record incoming inventory
 5. **Reports** - Sales analytics and trends
+6. **Internal Use** - Record $0 sales for internal use (orange toggle)
+7. **Custom Price/Discount** - Apply discounts with savings display (green toggle)
+8. **Collapsible Sidebar** - Toggle between full (256px) and icon-only (80px) modes
+9. **Inventory Filters** - Filter by: Todos | Con stock | Agotados
+10. **History Date Default** - Defaults to today's date
 
 ---
 
@@ -174,9 +262,62 @@ const { error } = await supabase
 
 ---
 
+## LocalStorage Keys
+
+| Key | Purpose | Values |
+|-----|---------|--------|
+| `rexvapes_darkmode` | Dark mode preference | `'true'` / `'false'` |
+| `rexvapes_sidebar_collapsed` | Sidebar collapse state | `'true'` / `'false'` |
+
+---
+
+## Sales Modal Features
+
+### Internal Use (Uso Interno)
+- Orange toggle button
+- Sets price to $0, disables price editing
+- Auto-prefixes notes with `[USO INTERNO]`
+- Mutually exclusive with discount
+
+### Custom Price/Discount (Descuento)
+- Green toggle button
+- Shows custom price input field
+- Displays savings: `Ahorras: $X.XX`
+- Auto-prefixes notes with `[DESCUENTO -$X.XX]`
+- Mutually exclusive with internal use
+
+---
+
+## Collapsible Sidebar
+
+**Props**: `collapsed`, `onCollapse`
+
+| State | Width | Content |
+|-------|-------|---------|
+| Expanded | 256px (`w-64`) | Full text + icons |
+| Collapsed | 80px (`w-20`) | Icons only + tooltips |
+
+Toggle button at bottom with ChevronLeft/ChevronRight icon.
+
+---
+
+## Inventory Filters
+
+Three filter buttons: **Todos** | **Con stock** | **Agotados**
+
+```javascript
+const matchesStock = stockFilter === 'all' ||
+  (stockFilter === 'stocked' && f.stock > 0) ||
+  (stockFilter === 'empty' && f.stock === 0)
+```
+
+---
+
 ## Notes
 
 - Stock decrements automatically on sale
 - Stock increments on restock
 - Flavors belong to models (FK relationship)
 - Soft delete via `is_active` flag (not actual DELETE)
+- History page defaults to today's date for both from/to filters
+- Dark mode toggle available on: Public pages, Login, Admin layout
