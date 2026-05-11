@@ -223,7 +223,7 @@ export default function History() {
                   <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Precio</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white"></th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cancelar</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">

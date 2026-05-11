@@ -40,7 +40,7 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
       <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-3' : 'p-4'}`}>
         <Link to="/dashboard" className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
           <img
-            src="/logo.png"
+            src={import.meta.env.BASE_URL + "logo.png"}
             alt="Rex Vapes"
             className={`rounded-lg ${isCollapsed ? 'w-12 h-12' : 'w-14 h-14'}`}
           />
@@ -131,7 +131,7 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Rex Vapes" className="w-10 h-10 rounded-lg" />
+          <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-10 h-10 rounded-lg" />
           <span className="text-lg font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
             REXVAPES
           </span>

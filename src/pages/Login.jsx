@@ -58,7 +58,7 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-3 justify-center">
-            <img src="/logo.png" alt="Rex Vapes" className="w-16 h-16 rounded-xl" />
+            <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-16 h-16 rounded-xl" />
             <span className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
               REXVAPES
             </span>
