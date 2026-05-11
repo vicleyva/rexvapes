@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { History as HistoryIcon, Download, Calendar, Search, X, XCircle } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { History as HistoryIcon, Download, Calendar, Search, X, XCircle, User } from 'lucide-react'
 import Swal from 'sweetalert2'
 
 export default function History() {
+  const { user } = useAuth()
   const [sales, setSales] = useState([])
   const [cancellations, setCancellations] = useState([])
   const [flavors, setFlavors] = useState({})
@@ -181,7 +183,8 @@ export default function History() {
           price: sale.price,
           total: sale.total,
           original_sold_at: sale.sold_at,
-          notes: sale.notes
+          notes: sale.notes,
+          cancelled_by: user?.email
         })
 
       if (cancelError) throw cancelError
@@ -213,7 +216,8 @@ export default function History() {
         total: sale.total,
         original_sold_at: sale.sold_at,
         cancelled_at: new Date().toISOString(),
-        notes: sale.notes
+        notes: sale.notes,
+        cancelled_by: user?.email
       }, ...prev])
 
       Swal.fire({
@@ -385,8 +389,8 @@ export default function History() {
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Modelo</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Precio</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Usuario</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cancelar</th>
                   </tr>
                 </thead>
@@ -412,11 +416,11 @@ export default function History() {
                             {sale.quantity}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">
-                          ${sale.price}
-                        </td>
                         <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                           ${sale.total}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          {sale.sold_by?.split('@')[0] || '-'}
                         </td>
                         <td className="px-4 py-3 text-center">
                           <button
@@ -451,11 +455,11 @@ export default function History() {
                 <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Cancelado</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Venta Original</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Modelo</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Por</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -466,9 +470,6 @@ export default function History() {
                       <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                           {formatDate(c.cancelled_at)}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-500">
-                          {formatDate(c.original_sold_at)}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                           {model?.name || ''}
@@ -485,6 +486,9 @@ export default function History() {
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                           ${c.total}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          {c.cancelled_by?.split('@')[0] || '-'}
                         </td>
                       </tr>
                     )

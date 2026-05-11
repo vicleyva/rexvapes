@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 import ModelSelector from '../components/ModelSelector'
 import SaleModal from '../components/SaleModal'
 import { ShoppingCart, Check } from 'lucide-react'
 
 export default function Sales() {
+  const { user } = useAuth()
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
   const [selectedModel, setSelectedModel] = useState(null)
@@ -53,7 +55,8 @@ export default function Sales() {
           quantity: saleData.quantity,
           price: saleData.price,
           total: saleData.total,
-          notes: saleData.notes
+          notes: saleData.notes,
+          sold_by: user?.email
         })
 
       if (saleError) throw saleError
