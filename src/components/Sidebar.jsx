@@ -37,20 +37,15 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
   const SidebarContent = ({ isCollapsed = false, showCollapseBtn = false }) => (
     <>
       {/* Logo */}
-      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-3' : 'p-4'}`}>
-        <Link to="/dashboard" className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-2' : 'p-3'}`}>
+        <Link to="/dashboard" className="flex flex-col items-center">
           <img
             src={import.meta.env.BASE_URL + "logo.png"}
             alt="Rex Vapes"
-            className={`rounded-lg ${isCollapsed ? 'w-12 h-12' : 'w-14 h-14'}`}
+            className={`object-contain ${isCollapsed ? 'w-14 h-14' : 'w-24 h-24'}`}
           />
           {!isCollapsed && (
-            <div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-                REXVAPES
-              </span>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Admin Panel</p>
-            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Admin Panel</p>
           )}
         </Link>
       </div>
@@ -131,10 +126,7 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-10 h-10 rounded-lg" />
-          <span className="text-lg font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-            REXVAPES
-          </span>
+          <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-12 h-12 object-contain" />
         </Link>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
