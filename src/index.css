@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Use class-based dark mode instead of media query */
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --primary: #8b5cf6;
   --primary-dark: #7c3aed;
