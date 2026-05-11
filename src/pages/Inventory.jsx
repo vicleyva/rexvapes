@@ -3,13 +3,14 @@ import { supabase } from '../lib/supabase'
 import FlavorCard from '../components/FlavorCard'
 import ModelSelector from '../components/ModelSelector'
 import RestockModal from '../components/RestockModal'
-import { Package, Search, Plus } from 'lucide-react'
+import { Package, Search, Plus, Filter } from 'lucide-react'
 
 export default function Inventory() {
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
   const [selectedModel, setSelectedModel] = useState(null)
   const [search, setSearch] = useState('')
+  const [stockFilter, setStockFilter] = useState('all') // 'all', 'stocked', 'empty'
   const [loading, setLoading] = useState(true)
   const [restockModal, setRestockModal] = useState({ isOpen: false, flavor: null })
 
@@ -108,7 +109,10 @@ export default function Inventory() {
     const matchesSearch = !search ||
       f.name.toLowerCase().includes(search.toLowerCase()) ||
       (f.name_es && f.name_es.toLowerCase().includes(search.toLowerCase()))
-    return matchesModel && matchesSearch
+    const matchesStock = stockFilter === 'all' ||
+      (stockFilter === 'stocked' && f.stock > 0) ||
+      (stockFilter === 'empty' && f.stock === 0)
+    return matchesModel && matchesSearch && matchesStock
   })
 
   if (loading) {
@@ -130,7 +134,7 @@ export default function Inventory() {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ModelSelector
             models={models}
             selectedModel={selectedModel}
@@ -145,6 +149,38 @@ export default function Inventory() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setStockFilter('all')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                stockFilter === 'all'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => setStockFilter('stocked')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                stockFilter === 'stocked'
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Con stock
+            </button>
+            <button
+              onClick={() => setStockFilter('empty')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                stockFilter === 'empty'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Agotados
+            </button>
           </div>
         </div>
       </div>

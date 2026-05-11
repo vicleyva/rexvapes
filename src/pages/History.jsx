@@ -7,8 +7,11 @@ export default function History() {
   const [flavors, setFlavors] = useState({})
   const [models, setModels] = useState({})
   const [loading, setLoading] = useState(true)
-  const [dateFrom, setDateFrom] = useState('')
-  const [dateTo, setDateTo] = useState('')
+
+  // Default to today's date
+  const today = new Date().toISOString().split('T')[0]
+  const [dateFrom, setDateFrom] = useState(today)
+  const [dateTo, setDateTo] = useState(today)
 
   useEffect(() => {
     fetchData()
