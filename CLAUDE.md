@@ -137,6 +137,20 @@ rm -rf node_modules package-lock.json && npm install
 
 ---
 
+## Versioning
+
+**Current Version**: `v1.0.3`
+
+**Location**: `src/components/PublicLayout.jsx` → `APP_VERSION` constant
+
+Displayed on public page header next to Login button. **Bump version on each deploy** to verify deployment.
+
+```javascript
+const APP_VERSION = 'v1.0.3'  // Update this!
+```
+
+---
+
 ## Environment Variables
 
 ```env
@@ -234,6 +248,8 @@ if (l.search[1] === '/' ) {
 8. **Collapsible Sidebar** - Toggle between full (256px) and icon-only (80px) modes
 9. **Inventory Filters** - Filter by: Todos | Con stock | Agotados
 10. **History Date Default** - Defaults to today's date
+11. **Cancel Sale** - X button on History to cancel sale and restore stock
+12. **Version Display** - Shows version on public page to verify deployments
 
 ---
 
@@ -313,6 +329,23 @@ const matchesStock = stockFilter === 'all' ||
 
 ---
 
+## Logo
+
+**File**: `public/logo.png` (Rex Vapes dinosaur logo)
+
+**Path in components**: Use `import.meta.env.BASE_URL + "logo.png"` for GitHub Pages compatibility.
+
+| Location | Size |
+|----------|------|
+| Sidebar (expanded) | 176px (`w-44`) |
+| Sidebar (collapsed) | 56px (`w-14`) |
+| Mobile header | 56px (`w-14`) |
+| Public header | 80px (`w-20`) |
+| Login page | 128px (`w-32`) |
+| Favicon | `index.html` → `./logo.png` |
+
+---
+
 ## Notes
 
 - Stock decrements automatically on sale
@@ -321,3 +354,4 @@ const matchesStock = stockFilter === 'all' ||
 - Soft delete via `is_active` flag (not actual DELETE)
 - History page defaults to today's date for both from/to filters
 - Dark mode toggle available on: Public pages, Login, Admin layout
+- Cancel sale restores stock automatically
