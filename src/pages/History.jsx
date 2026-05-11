@@ -15,6 +15,8 @@ export default function History() {
   const today = new Date().toISOString().split('T')[0]
   const [dateFrom, setDateFrom] = useState(today)
   const [dateTo, setDateTo] = useState(today)
+  const [filterModel, setFilterModel] = useState('')
+  const [filterFlavor, setFilterFlavor] = useState('')
 
   useEffect(() => {
     fetchData()
@@ -69,8 +71,21 @@ export default function History() {
     const saleLocalDate = new Date(sale.sold_at).toLocaleDateString('en-CA')
     if (dateFrom && saleLocalDate < dateFrom) return false
     if (dateTo && saleLocalDate > dateTo) return false
+
+    // Model filter
+    const flavor = flavors[sale.flavor_id]
+    if (filterModel && flavor?.model_id !== filterModel) return false
+
+    // Flavor filter
+    if (filterFlavor && sale.flavor_id !== filterFlavor) return false
+
     return true
   })
+
+  // Get flavors for selected model (for cascading filter)
+  const filteredFlavorOptions = filterModel
+    ? Object.values(flavors).filter(f => f.model_id === filterModel)
+    : Object.values(flavors)
 
   const filteredCancellations = cancellations.filter(c => {
     const cancelLocalDate = new Date(c.cancelled_at).toLocaleDateString('en-CA')
@@ -241,7 +256,7 @@ export default function History() {
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -266,9 +281,39 @@ export default function History() {
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Modelo
+            </label>
+            <select
+              value={filterModel}
+              onChange={(e) => { setFilterModel(e.target.value); setFilterFlavor('') }}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Todos</option>
+              {Object.values(models).map(m => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Sabor
+            </label>
+            <select
+              value={filterFlavor}
+              onChange={(e) => setFilterFlavor(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Todos</option>
+              {filteredFlavorOptions.map(f => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-end">
             <button
-              onClick={() => { setDateFrom(''); setDateTo('') }}
+              onClick={() => { setDateFrom(''); setDateTo(''); setFilterModel(''); setFilterFlavor('') }}
               className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             >
               Limpiar filtros
@@ -337,7 +382,8 @@ export default function History() {
                 <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Fecha</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Producto</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Modelo</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Precio</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
@@ -353,11 +399,13 @@ export default function History() {
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                           {formatDate(sale.sold_at)}
                         </td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          {model?.name || ''}
+                        </td>
                         <td className="px-4 py-3">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {flavor?.name || 'Desconocido'}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{model?.name || ''}</p>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-sm font-medium px-2 py-1 rounded">
@@ -404,7 +452,8 @@ export default function History() {
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Cancelado</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Venta Original</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Producto</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Modelo</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
                   </tr>
@@ -421,11 +470,13 @@ export default function History() {
                         <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-500">
                           {formatDate(c.original_sold_at)}
                         </td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          {model?.name || ''}
+                        </td>
                         <td className="px-4 py-3">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {flavor?.name || 'Desconocido'}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{model?.name || ''}</p>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className="bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-sm font-medium px-2 py-1 rounded">
