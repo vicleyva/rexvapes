@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import AvailabilityCard from '../../components/AvailabilityCard'
-import { MessageCircle, MapPin, RefreshCw } from 'lucide-react'
+import { MessageCircle, MapPin, RefreshCw, LayoutGrid, List, Check, X } from 'lucide-react'
 
 export default function Availability() {
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
+  const [viewMode, setViewMode] = useState(() => {
+    return localStorage.getItem('rexvapes_viewmode') || 'cards'
+  })
+
+  const toggleViewMode = (mode) => {
+    setViewMode(mode)
+    localStorage.setItem('rexvapes_viewmode', mode)
+  }
 
   const fetchData = async () => {
     setLoading(true)
@@ -77,6 +85,31 @@ export default function Availability() {
             Actualizado: {formatTime(lastUpdated)}
           </span>
         </div>
+        {/* View toggle */}
+        <div className="flex items-center justify-center gap-2 mt-4">
+          <button
+            onClick={() => toggleViewMode('cards')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              viewMode === 'cards'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            Cards
+          </button>
+          <button
+            onClick={() => toggleViewMode('rows')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              viewMode === 'rows'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <List className="w-4 h-4" />
+            Lista
+          </button>
+        </div>
       </div>
 
       {/* Models and flavors */}
@@ -107,13 +140,56 @@ export default function Availability() {
               </div>
             </div>
 
-            {/* Flavors grid */}
+            {/* Flavors display */}
             {modelFlavors.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {modelFlavors.map(flavor => (
-                  <AvailabilityCard key={flavor.id} flavor={flavor} />
-                ))}
-              </div>
+              viewMode === 'cards' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {modelFlavors.map(flavor => (
+                    <AvailabilityCard key={flavor.id} flavor={flavor} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  {modelFlavors.map((flavor, idx) => {
+                    const isAvailable = flavor.stock > 0
+                    return (
+                      <div
+                        key={flavor.id}
+                        className={`flex items-center justify-between px-4 py-3 ${
+                          idx !== modelFlavors.length - 1 ? 'border-b border-gray-100 dark:border-gray-700' : ''
+                        } ${isAvailable ? '' : 'opacity-50'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            isAvailable ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-600'
+                          }`}>
+                            {isAvailable ? (
+                              <Check className="w-4 h-4 text-white" />
+                            ) : (
+                              <X className="w-4 h-4 text-white" />
+                            )}
+                          </div>
+                          <div>
+                            <span className={`font-medium ${isAvailable ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+                              {flavor.name}
+                            </span>
+                            {flavor.name_es && (
+                              <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                                {flavor.name_es}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span className={`text-sm font-medium ${
+                          isAvailable ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {isAvailable ? 'Disponible' : 'Agotado'}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )
             ) : (
               <p className="text-center text-gray-500 dark:text-gray-400 py-8">No hay sabores registrados para este modelo</p>
             )}
