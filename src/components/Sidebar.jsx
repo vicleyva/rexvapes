@@ -16,6 +16,8 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
+const APP_VERSION = 'v1.0.5'
+
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/inventory', label: 'Inventario', icon: Package },
@@ -36,6 +38,20 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
 
   const SidebarContent = ({ isCollapsed = false, showCollapseBtn = false }) => (
     <>
+      {/* Collapse button at top */}
+      {showCollapseBtn && (
+        <div className={`flex ${isCollapsed ? 'justify-center p-2' : 'justify-between items-center px-3 py-2'}`}>
+          {!isCollapsed && <span className="text-xs text-gray-400 dark:text-gray-500">{APP_VERSION}</span>}
+          <button
+            onClick={onCollapse}
+            title={isCollapsed ? 'Expandir' : 'Colapsar'}
+            className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+          </button>
+        </div>
+      )}
+
       {/* Logo */}
       <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-1' : 'p-0'}`}>
         <Link to="/dashboard" className="flex flex-col items-center">
@@ -44,9 +60,6 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
             alt="Rex Vapes"
             className={`object-contain ${isCollapsed ? 'w-18 h-18' : 'w-64 h-auto'}`}
           />
-          {!isCollapsed && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">Admin Panel</p>
-          )}
         </Link>
       </div>
 
@@ -97,19 +110,6 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
           <LogOut className="w-5 h-5" />
           {!isCollapsed && 'Cerrar Sesión'}
         </button>
-
-        {/* Collapse button */}
-        {showCollapseBtn && (
-          <button
-            onClick={onCollapse}
-            className={`w-full flex items-center rounded-xl text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-              isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'
-            }`}
-          >
-            {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-            {!isCollapsed && 'Colapsar'}
-          </button>
-        )}
       </div>
     </>
   )
