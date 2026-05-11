@@ -12,16 +12,18 @@ import {
   X,
   ExternalLink,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CalendarClock
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = 'v1.1.5'
+const APP_VERSION = 'v1.2.0'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/inventory', label: 'Inventario', icon: Package },
   { path: '/sales', label: 'Vender', icon: ShoppingCart },
+  { path: '/reservations', label: 'Reservaciones', icon: CalendarClock },
   { path: '/history', label: 'Historial', icon: History },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/settings', label: 'Configuración', icon: Settings },

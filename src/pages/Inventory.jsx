@@ -8,6 +8,7 @@ import { Package, Search, Plus, Filter } from 'lucide-react'
 export default function Inventory() {
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
+  const [reservations, setReservations] = useState([])
   const [selectedModel, setSelectedModel] = useState(null)
   const [search, setSearch] = useState('')
   const [stockFilter, setStockFilter] = useState('all') // 'all', 'stocked', 'empty'
@@ -20,20 +21,15 @@ export default function Inventory() {
 
   const fetchData = async () => {
     try {
-      const { data: modelsData } = await supabase
-        .from('models')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
-
-      const { data: flavorsData } = await supabase
-        .from('flavors')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
+      const [{ data: modelsData }, { data: flavorsData }, { data: reservationsData }] = await Promise.all([
+        supabase.from('models').select('*').eq('is_active', true).order('name'),
+        supabase.from('flavors').select('*').eq('is_active', true).order('name'),
+        supabase.from('reservations').select('flavor_id, quantity').eq('status', 'active')
+      ])
 
       setModels(modelsData || [])
       setFlavors(flavorsData || [])
+      setReservations(reservationsData || [])
 
       if (modelsData && modelsData.length > 0 && !selectedModel) {
         setSelectedModel(modelsData[0])
@@ -104,14 +100,21 @@ export default function Inventory() {
     }
   }
 
+  const getReservedQty = (flavorId) => {
+    return reservations
+      .filter(r => r.flavor_id === flavorId)
+      .reduce((sum, r) => sum + r.quantity, 0)
+  }
+
   const filteredFlavors = flavors.filter(f => {
     const matchesModel = !selectedModel || f.model_id === selectedModel.id
     const matchesSearch = !search ||
       f.name.toLowerCase().includes(search.toLowerCase()) ||
       (f.name_es && f.name_es.toLowerCase().includes(search.toLowerCase()))
+    const available = f.stock - getReservedQty(f.id)
     const matchesStock = stockFilter === 'all' ||
-      (stockFilter === 'stocked' && f.stock > 0) ||
-      (stockFilter === 'empty' && f.stock === 0)
+      (stockFilter === 'stocked' && available > 0) ||
+      (stockFilter === 'empty' && available === 0)
     return matchesModel && matchesSearch && matchesStock
   })
 
@@ -192,6 +195,7 @@ export default function Inventory() {
               <FlavorCard
                 flavor={flavor}
                 onAdjust={handleAdjust}
+                reserved={getReservedQty(flavor.id)}
               />
               <button
                 onClick={() => setRestockModal({ isOpen: true, flavor })}

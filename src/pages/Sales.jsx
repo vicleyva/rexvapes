@@ -9,6 +9,7 @@ export default function Sales() {
   const { user } = useAuth()
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
+  const [reservations, setReservations] = useState([])
   const [selectedModel, setSelectedModel] = useState(null)
   const [saleModal, setSaleModal] = useState({ isOpen: false, flavor: null })
   const [loading, setLoading] = useState(true)
@@ -20,20 +21,15 @@ export default function Sales() {
 
   const fetchData = async () => {
     try {
-      const { data: modelsData } = await supabase
-        .from('models')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
-
-      const { data: flavorsData } = await supabase
-        .from('flavors')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
+      const [{ data: modelsData }, { data: flavorsData }, { data: reservationsData }] = await Promise.all([
+        supabase.from('models').select('*').eq('is_active', true).order('name'),
+        supabase.from('flavors').select('*').eq('is_active', true).order('name'),
+        supabase.from('reservations').select('flavor_id, quantity').eq('status', 'active')
+      ])
 
       setModels(modelsData || [])
       setFlavors(flavorsData || [])
+      setReservations(reservationsData || [])
 
       if (modelsData && modelsData.length > 0) {
         setSelectedModel(modelsData[0])
@@ -88,14 +84,24 @@ export default function Sales() {
     }
   }
 
+  const getReservedQty = (flavorId) => {
+    return reservations
+      .filter(r => r.flavor_id === flavorId)
+      .reduce((sum, r) => sum + r.quantity, 0)
+  }
+
+  const getAvailableStock = (flavor) => {
+    return flavor.stock - getReservedQty(flavor.id)
+  }
+
   const getModelFlavors = () => {
     if (!selectedModel) return []
     return flavors.filter(f => f.model_id === selectedModel.id)
   }
 
-  const getStockStyle = (stock) => {
-    if (stock === 0) return 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
-    if (stock <= 2) return 'bg-yellow-50 border-yellow-300 hover:border-yellow-400 hover:shadow-md cursor-pointer'
+  const getStockStyle = (available) => {
+    if (available <= 0) return 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+    if (available <= 2) return 'bg-yellow-50 border-yellow-300 hover:border-yellow-400 hover:shadow-md cursor-pointer'
     return 'bg-green-50 border-green-300 hover:border-green-400 hover:shadow-md cursor-pointer'
   }
 
@@ -146,30 +152,39 @@ export default function Sales() {
             Selecciona el sabor para registrar la venta:
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {getModelFlavors().map(flavor => (
-              <div
-                key={flavor.id}
-                onClick={() => flavor.stock > 0 && setSaleModal({ isOpen: true, flavor })}
-                className={`rounded-xl border-2 p-4 transition-all ${getStockStyle(flavor.stock)}`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">{flavor.name}</h3>
-                    {flavor.name_es && (
-                      <p className="text-sm text-gray-500 truncate">{flavor.name_es}</p>
+            {getModelFlavors().map(flavor => {
+              const available = getAvailableStock(flavor)
+              const reserved = getReservedQty(flavor.id)
+              return (
+                <div
+                  key={flavor.id}
+                  onClick={() => available > 0 && setSaleModal({ isOpen: true, flavor: { ...flavor, stock: available } })}
+                  className={`rounded-xl border-2 p-4 transition-all ${getStockStyle(available)}`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate">{flavor.name}</h3>
+                      {flavor.name_es && (
+                        <p className="text-sm text-gray-500 truncate">{flavor.name_es}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <div>
+                      <span className={`text-sm ${available === 0 ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Stock: {available}
+                      </span>
+                      {reserved > 0 && (
+                        <span className="text-xs text-orange-500 ml-1">({reserved} res.)</span>
+                      )}
+                    </div>
+                    {available > 0 && (
+                      <ShoppingCart className="w-5 h-5 text-cyan-500" />
                     )}
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className={`text-sm ${flavor.stock === 0 ? 'text-gray-400' : 'text-gray-600'}`}>
-                    Stock: {flavor.stock}
-                  </span>
-                  {flavor.stock > 0 && (
-                    <ShoppingCart className="w-5 h-5 text-cyan-500" />
-                  )}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {getModelFlavors().length === 0 && (
