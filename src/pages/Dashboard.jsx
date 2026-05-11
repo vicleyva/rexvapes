@@ -28,7 +28,6 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      // Get flavors for stock stats
       const { data: flavors } = await supabase
         .from('flavors')
         .select('*')
@@ -45,7 +44,6 @@ export default function Dashboard() {
         setLowStockItems(lowStock)
       }
 
-      // Get today's sales
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
@@ -62,7 +60,6 @@ export default function Dashboard() {
         }))
       }
 
-      // Get week's revenue
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
 
@@ -87,7 +84,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -95,95 +92,92 @@ export default function Dashboard() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
         <Link
           to="/sales"
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
         >
           <Plus className="w-5 h-5" />
           Nueva Venta
         </Link>
       </div>
 
-      {/* Low stock alert */}
       {lowStockItems.length > 0 && (
         <div className="mb-6">
           <LowStockAlert items={lowStockItems} />
         </div>
       )}
 
-      {/* Stats grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Package className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <Package className="w-5 h-5 text-blue-500 dark:text-blue-400" />
             </div>
-            <span className="text-sm text-gray-600">Stock Total</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Stock Total</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{stats.totalStock}</p>
-          <p className="text-sm text-gray-500">{stats.totalFlavors} sabores</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalStock}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{stats.totalFlavors} sabores</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
-            <span className="text-sm text-gray-600">Ventas Hoy</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Ventas Hoy</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{stats.todaySales}</p>
-          <p className="text-sm text-gray-500">unidades</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.todaySales}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">unidades</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <span className="text-sm text-gray-600">Ingresos Hoy</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Ingresos Hoy</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">${stats.todayRevenue}</p>
-          <p className="text-sm text-gray-500">MXN</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.todayRevenue}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">MXN</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-pink-600" />
+            <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-cyan-500 dark:text-cyan-400" />
             </div>
-            <span className="text-sm text-gray-600">Semana</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Semana</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">${stats.weekRevenue}</p>
-          <p className="text-sm text-gray-500">MXN (7 días)</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.weekRevenue}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">MXN (7 días)</p>
         </div>
       </div>
 
-      {/* Quick actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link
           to="/inventory"
-          className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow group"
+          className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow group"
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Ver Inventario</h3>
-              <p className="text-gray-600">Administrar stock de productos</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ver Inventario</h3>
+              <p className="text-gray-600 dark:text-gray-400">Administrar stock de productos</p>
             </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
           </div>
         </Link>
 
         <Link
           to="/history"
-          className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow group"
+          className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow group"
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Historial de Ventas</h3>
-              <p className="text-gray-600">Ver todas las transacciones</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Historial de Ventas</h3>
+              <p className="text-gray-600 dark:text-gray-400">Ver todas las transacciones</p>
             </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
           </div>
         </Link>
       </div>

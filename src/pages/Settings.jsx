@@ -193,19 +193,19 @@ export default function Settings() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Configuración</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Configuración</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Models section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <SettingsIcon className="w-5 h-5 text-purple-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Modelos</h2>
+              <SettingsIcon className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Modelos</h2>
             </div>
             <button
               onClick={() => setShowNewModel(true)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200"
+              className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-900"
             >
               <Plus className="w-4 h-4" />
               Agregar
@@ -214,41 +214,41 @@ export default function Settings() {
 
           {/* New model form */}
           {showNewModel && (
-            <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
               <div className="grid grid-cols-3 gap-3 mb-3">
                 <input
                   type="text"
                   placeholder="Nombre"
                   value={newModel.name}
                   onChange={(e) => setNewModel({ ...newModel, name: e.target.value })}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <input
                   type="number"
                   placeholder="Puffs"
                   value={newModel.puffs}
                   onChange={(e) => setNewModel({ ...newModel, puffs: e.target.value })}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <input
                   type="number"
                   placeholder="Precio"
                   value={newModel.price}
                   onChange={(e) => setNewModel({ ...newModel, price: e.target.value })}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleAddModel}
-                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600"
                 >
                   <Check className="w-4 h-4" />
                   Guardar
                 </button>
                 <button
                   onClick={() => { setShowNewModel(false); setNewModel({ name: '', puffs: '', price: '' }) }}
-                  className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300"
+                  className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -259,7 +259,7 @@ export default function Settings() {
           {/* Models list */}
           <div className="space-y-3">
             {models.map(model => (
-              <div key={model.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div key={model.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 {editingModel?.id === model.id ? (
                   <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-2">
@@ -267,19 +267,19 @@ export default function Settings() {
                         type="text"
                         value={editingModel.name}
                         onChange={(e) => setEditingModel({ ...editingModel, name: e.target.value })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                       <input
                         type="number"
                         value={editingModel.puffs || ''}
                         onChange={(e) => setEditingModel({ ...editingModel, puffs: e.target.value ? parseInt(e.target.value) : null })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                       <input
                         type="number"
                         value={editingModel.price}
                         onChange={(e) => setEditingModel({ ...editingModel, price: parseFloat(e.target.value) })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                     </div>
                     <div className="flex gap-2">
@@ -291,7 +291,7 @@ export default function Settings() {
                       </button>
                       <button
                         onClick={() => setEditingModel(null)}
-                        className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300"
+                        className="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-500"
                       >
                         Cancelar
                       </button>
@@ -300,22 +300,22 @@ export default function Settings() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold text-gray-900">{model.name}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-semibold text-gray-900 dark:text-white">{model.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {model.puffs && `${model.puffs} puffs • `}${getModelFlavors(model.id).length} sabores
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-purple-600">${model.price}</span>
+                      <span className="text-lg font-bold text-blue-500 dark:text-blue-400">${model.price}</span>
                       <button
                         onClick={() => setEditingModel(model)}
-                        className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
+                        className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-purple-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteModel(model.id)}
-                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                        className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -328,15 +328,15 @@ export default function Settings() {
         </div>
 
         {/* Flavors section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Package className="w-5 h-5 text-green-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Sabores</h2>
+              <Package className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Sabores</h2>
             </div>
             <button
               onClick={() => { setShowNewFlavor(true); setNewFlavor({ ...newFlavor, model_id: selectedModelForFlavors }) }}
-              className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
+              className="flex items-center gap-1 px-3 py-1.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-lg text-sm font-medium hover:bg-green-200 dark:hover:bg-green-900"
             >
               <Plus className="w-4 h-4" />
               Agregar
@@ -347,7 +347,7 @@ export default function Settings() {
           <select
             value={selectedModelForFlavors || ''}
             onChange={(e) => setSelectedModelForFlavors(e.target.value)}
-            className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg"
+            className="w-full mb-4 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             {models.map(model => (
               <option key={model.id} value={model.id}>{model.name}</option>
@@ -356,21 +356,21 @@ export default function Settings() {
 
           {/* New flavor form */}
           {showNewFlavor && (
-            <div className="mb-4 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-700">
               <div className="space-y-3 mb-3">
                 <input
                   type="text"
                   placeholder="Nombre (inglés)"
                   value={newFlavor.name}
                   onChange={(e) => setNewFlavor({ ...newFlavor, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <input
                   type="text"
                   placeholder="Nombre (español) - opcional"
                   value={newFlavor.name_es}
                   onChange={(e) => setNewFlavor({ ...newFlavor, name_es: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div className="flex gap-2">
@@ -383,7 +383,7 @@ export default function Settings() {
                 </button>
                 <button
                   onClick={() => { setShowNewFlavor(false); setNewFlavor({ name: '', name_es: '', model_id: '' }) }}
-                  className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300"
+                  className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -394,20 +394,20 @@ export default function Settings() {
           {/* Flavors list */}
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {getModelFlavors(selectedModelForFlavors).map(flavor => (
-              <div key={flavor.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div key={flavor.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 {editingFlavor?.id === flavor.id ? (
                   <div className="space-y-2">
                     <input
                       type="text"
                       value={editingFlavor.name}
                       onChange={(e) => setEditingFlavor({ ...editingFlavor, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     />
                     <input
                       type="text"
                       value={editingFlavor.name_es || ''}
                       onChange={(e) => setEditingFlavor({ ...editingFlavor, name_es: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       placeholder="Nombre español"
                     />
                     <div className="flex gap-2">
@@ -419,7 +419,7 @@ export default function Settings() {
                       </button>
                       <button
                         onClick={() => setEditingFlavor(null)}
-                        className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium"
+                        className="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium"
                       >
                         Cancelar
                       </button>
@@ -428,28 +428,28 @@ export default function Settings() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">{flavor.name}</p>
+                      <p className="font-medium text-gray-900 dark:text-white truncate">{flavor.name}</p>
                       {flavor.name_es && (
-                        <p className="text-sm text-gray-500 truncate">{flavor.name_es}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{flavor.name_es}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-2 ml-2">
                       <span className={`text-sm font-bold px-2 py-1 rounded ${
-                        flavor.stock === 0 ? 'bg-red-100 text-red-700' :
-                        flavor.stock <= 2 ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-green-100 text-green-700'
+                        flavor.stock === 0 ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300' :
+                        flavor.stock <= 2 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300' :
+                        'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300'
                       }`}>
                         {flavor.stock}
                       </span>
                       <button
                         onClick={() => setEditingFlavor(flavor)}
-                        className="p-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded"
+                        className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteFlavor(flavor.id)}
-                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
+                        className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -459,7 +459,7 @@ export default function Settings() {
               </div>
             ))}
             {getModelFlavors(selectedModelForFlavors).length === 0 && (
-              <p className="text-gray-500 text-center py-4">No hay sabores para este modelo</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">No hay sabores para este modelo</p>
             )}
           </div>
         </div>

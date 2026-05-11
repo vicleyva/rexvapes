@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://yourusername.github.io/rexvapes",
+  "homepage": "https://vleyva5.github.io/rexvapes",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

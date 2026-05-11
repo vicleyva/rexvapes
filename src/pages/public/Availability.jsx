@@ -54,7 +54,7 @@ export default function Availability() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -68,7 +68,7 @@ export default function Availability() {
         <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={fetchData}
-            className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700"
+            className="flex items-center gap-2 text-sm text-blue-500 hover:text-blue-600"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
@@ -96,7 +96,7 @@ export default function Availability() {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-purple-600">${model.price}</p>
+                  <p className="text-2xl font-bold text-blue-500">${model.price}</p>
                   <p className="text-sm text-gray-500">MXN</p>
                 </div>
               </div>
@@ -132,7 +132,7 @@ export default function Availability() {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto</h3>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            href="https://wa.me/528123456789"
+            href="https://wa.me/528120187524"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors"

@@ -103,7 +103,7 @@ export default function History() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -111,10 +111,10 @@ export default function History() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Historial de Ventas</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Historial de Ventas</h1>
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
         >
           <Download className="w-4 h-4" />
           Exportar CSV
@@ -122,10 +122,10 @@ export default function History() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
               Desde
             </label>
@@ -133,11 +133,11 @@ export default function History() {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
               Hasta
             </label>
@@ -145,13 +145,13 @@ export default function History() {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex items-end">
             <button
               onClick={() => { setDateFrom(''); setDateTo('') }}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             >
               Limpiar filtros
             </button>
@@ -161,54 +161,54 @@ export default function History() {
 
       {/* Summary */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-purple-50 rounded-xl p-4">
-          <p className="text-sm text-purple-600 font-medium">Total Vendido</p>
-          <p className="text-2xl font-bold text-purple-700">{totalUnits} unidades</p>
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4">
+          <p className="text-sm text-blue-500 dark:text-blue-400 font-medium">Total Vendido</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">{totalUnits} unidades</p>
         </div>
-        <div className="bg-green-50 rounded-xl p-4">
-          <p className="text-sm text-green-600 font-medium">Ingresos</p>
-          <p className="text-2xl font-bold text-green-700">${totalRevenue.toFixed(2)} MXN</p>
+        <div className="bg-green-50 dark:bg-green-900/30 rounded-xl p-4">
+          <p className="text-sm text-green-600 dark:text-green-400 font-medium">Ingresos</p>
+          <p className="text-2xl font-bold text-green-700 dark:text-green-300">${totalRevenue.toFixed(2)} MXN</p>
         </div>
       </div>
 
       {/* Sales table */}
       {filteredSales.length > 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Fecha</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Producto</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900">Cant.</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">Precio</th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">Total</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Fecha</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Producto</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Precio</th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filteredSales.map(sale => {
                   const flavor = flavors[sale.flavor_id]
                   const model = flavor ? models[flavor.model_id] : null
                   return (
-                    <tr key={sale.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                    <tr key={sale.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                         {formatDate(sale.sold_at)}
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {flavor?.name || 'Desconocido'}
                         </p>
-                        <p className="text-xs text-gray-500">{model?.name || ''}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{model?.name || ''}</p>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className="bg-purple-100 text-purple-700 text-sm font-medium px-2 py-1 rounded">
+                        <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-sm font-medium px-2 py-1 rounded">
                           {sale.quantity}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right text-sm text-gray-600">
+                      <td className="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">
                         ${sale.price}
                       </td>
-                      <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                      <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                         ${sale.total}
                       </td>
                     </tr>
@@ -219,9 +219,9 @@ export default function History() {
           </div>
         </div>
       ) : (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <HistoryIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No hay ventas registradas</p>
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <HistoryIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">No hay ventas registradas</p>
         </div>
       )}
     </div>

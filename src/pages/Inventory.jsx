@@ -50,7 +50,6 @@ export default function Inventory() {
 
     const newStock = Math.max(0, flavor.stock + delta)
 
-    // Optimistic update
     setFlavors(prev => prev.map(f =>
       f.id === flavorId ? { ...f, stock: newStock } : f
     ))
@@ -62,13 +61,8 @@ export default function Inventory() {
         .eq('id', flavorId)
 
       if (error) throw error
-
-      // If decrementing (sale-like action), could record it
-      // For now, just update stock
-
     } catch (error) {
       console.error('Error updating stock:', error)
-      // Revert on error
       setFlavors(prev => prev.map(f =>
         f.id === flavorId ? { ...f, stock: flavor.stock } : f
       ))
@@ -77,7 +71,6 @@ export default function Inventory() {
 
   const handleRestock = async (data) => {
     try {
-      // Record restock
       const { error: restockError } = await supabase
         .from('restocks')
         .insert({
@@ -89,7 +82,6 @@ export default function Inventory() {
 
       if (restockError) throw restockError
 
-      // Update stock
       const flavor = flavors.find(f => f.id === data.flavor_id)
       const newStock = flavor.stock + data.quantity
 
@@ -100,7 +92,6 @@ export default function Inventory() {
 
       if (updateError) throw updateError
 
-      // Update local state
       setFlavors(prev => prev.map(f =>
         f.id === data.flavor_id ? { ...f, stock: newStock } : f
       ))
@@ -123,7 +114,7 @@ export default function Inventory() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -131,15 +122,14 @@ export default function Inventory() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Inventario</h1>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Inventario</h1>
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <Package className="w-4 h-4" />
           <span>{flavors.reduce((sum, f) => sum + f.stock, 0)} unidades totales</span>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ModelSelector
             models={models}
@@ -153,13 +143,12 @@ export default function Inventory() {
               placeholder="Buscar sabor..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
       </div>
 
-      {/* Inventory grid */}
       {filteredFlavors.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredFlavors.map(flavor => (
@@ -179,13 +168,12 @@ export default function Inventory() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No se encontraron sabores</p>
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <Package className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">No se encontraron sabores</p>
         </div>
       )}
 
-      {/* Restock modal */}
       <RestockModal
         isOpen={restockModal.isOpen}
         onClose={() => setRestockModal({ isOpen: false, flavor: null })}

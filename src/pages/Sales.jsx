@@ -99,7 +99,7 @@ export default function Sales() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -107,11 +107,11 @@ export default function Sales() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Registrar Venta</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Registrar Venta</h1>
         {selectedModel && (
           <div className="text-right">
             <p className="text-sm text-gray-500">Precio por unidad</p>
-            <p className="text-xl font-bold text-purple-600">${selectedModel.price} MXN</p>
+            <p className="text-xl font-bold text-blue-500">${selectedModel.price} MXN</p>
           </div>
         )}
       </div>
@@ -125,8 +125,8 @@ export default function Sales() {
       )}
 
       {/* Model selector */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Selecciona el modelo
         </label>
         <ModelSelector
@@ -139,7 +139,7 @@ export default function Sales() {
       {/* Flavors grid */}
       {selectedModel ? (
         <>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Selecciona el sabor para registrar la venta:
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -162,7 +162,7 @@ export default function Sales() {
                     Stock: {flavor.stock}
                   </span>
                   {flavor.stock > 0 && (
-                    <ShoppingCart className="w-5 h-5 text-purple-500" />
+                    <ShoppingCart className="w-5 h-5 text-cyan-500" />
                   )}
                 </div>
               </div>
@@ -170,15 +170,15 @@ export default function Sales() {
           </div>
 
           {getModelFlavors().length === 0 && (
-            <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-              <p className="text-gray-500">No hay sabores para este modelo</p>
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+              <p className="text-gray-500 dark:text-gray-400">No hay sabores para este modelo</p>
             </div>
           )}
         </>
       ) : (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <ShoppingCart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">Selecciona un modelo para ver los sabores</p>
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <ShoppingCart className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">Selecciona un modelo para ver los sabores</p>
         </div>
       )}
 
