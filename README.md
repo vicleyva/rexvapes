@@ -63,3 +63,4 @@ Or push to main branch - GitHub Actions will auto-deploy.
 ## Create Admin User
 
 In Supabase Dashboard > Authentication > Users > Add user
+
