@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { History as HistoryIcon, Download, Calendar, Search, X } from 'lucide-react'
+import Swal from 'sweetalert2'
 
 export default function History() {
   const [sales, setSales] = useState([])
@@ -101,9 +102,29 @@ export default function History() {
   }
 
   const cancelSale = async (sale) => {
-    if (!confirm(`¿Cancelar venta de ${sale.quantity} unidad(es)? El stock será restaurado.`)) {
-      return
-    }
+    const flavor = flavors[sale.flavor_id]
+    const model = flavor ? models[flavor.model_id] : null
+
+    const result = await Swal.fire({
+      title: '¿Cancelar venta?',
+      html: `
+        <div class="text-left">
+          <p><strong>${flavor?.name || 'Producto'}</strong></p>
+          <p class="text-sm text-gray-500">${model?.name || ''}</p>
+          <p class="mt-2">Cantidad: <strong>${sale.quantity}</strong></p>
+          <p>Total: <strong>$${sale.total}</strong></p>
+          <p class="mt-3 text-sm text-gray-500">El stock será restaurado.</p>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, cancelar',
+      cancelButtonText: 'No'
+    })
+
+    if (!result.isConfirmed) return
 
     try {
       // Get current stock
@@ -149,9 +170,21 @@ export default function History() {
 
       // Update local state
       setSales(prev => prev.filter(s => s.id !== sale.id))
+
+      Swal.fire({
+        title: 'Cancelada',
+        text: 'La venta fue cancelada y el stock restaurado.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      })
     } catch (error) {
       console.error('Error canceling sale:', error)
-      alert('Error al cancelar la venta')
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo cancelar la venta.',
+        icon: 'error'
+      })
     }
   }
 
