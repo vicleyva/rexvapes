@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { History as HistoryIcon, Download, Calendar, Search } from 'lucide-react'
+import { History as HistoryIcon, Download, Calendar, Search, X } from 'lucide-react'
 
 export default function History() {
   const [sales, setSales] = useState([])
@@ -103,6 +103,46 @@ export default function History() {
     URL.revokeObjectURL(url)
   }
 
+  const cancelSale = async (sale) => {
+    if (!confirm(`¿Cancelar venta de ${sale.quantity} unidad(es)? El stock será restaurado.`)) {
+      return
+    }
+
+    try {
+      // Get current stock
+      const { data: flavorData, error: fetchError } = await supabase
+        .from('flavors')
+        .select('stock')
+        .eq('id', sale.flavor_id)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      // Restore stock
+      const newStock = (flavorData?.stock || 0) + sale.quantity
+      const { error: updateError } = await supabase
+        .from('flavors')
+        .update({ stock: newStock })
+        .eq('id', sale.flavor_id)
+
+      if (updateError) throw updateError
+
+      // Delete sale
+      const { error: deleteError } = await supabase
+        .from('sales')
+        .delete()
+        .eq('id', sale.id)
+
+      if (deleteError) throw deleteError
+
+      // Update local state
+      setSales(prev => prev.filter(s => s.id !== sale.id))
+    } catch (error) {
+      console.error('Error canceling sale:', error)
+      alert('Error al cancelar la venta')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -186,6 +226,7 @@ export default function History() {
                   <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Precio</th>
                   <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -213,6 +254,15 @@ export default function History() {
                       </td>
                       <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                         ${sale.total}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => cancelSale(sale)}
+                          className="p-1.5 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                          title="Cancelar venta"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   )
