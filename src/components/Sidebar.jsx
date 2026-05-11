@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = 'v1.1.2'
+const APP_VERSION = 'v1.1.3'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -58,7 +58,7 @@ export default function Sidebar({ darkMode, collapsed, onCollapse }) {
           <img
             src={import.meta.env.BASE_URL + "logo.png"}
             alt="Rex Vapes"
-            className={`object-contain ${isCollapsed ? 'w-18 h-18' : 'w-64 h-auto'}`}
+            className={`object-contain ${isCollapsed ? 'w-16 h-16' : 'w-full h-48'}`}
           />
         </Link>
       </div>

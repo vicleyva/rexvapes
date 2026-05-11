@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { LogIn, Moon, Sun } from 'lucide-react'
 
-const APP_VERSION = 'v1.1.2'
+const APP_VERSION = 'v1.1.3'
 
 export default function PublicLayout({ children }) {
   const [darkMode, setDarkMode] = useState(() => {
