@@ -22,8 +22,8 @@ export default function PublicLayout({ children }) {
       {/* Header */}
       <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-14 h-14 object-contain" />
+          <div className="flex items-center">
+            <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-20 h-20 object-contain" />
           </div>
           <div className="flex items-center gap-3">
             <button
