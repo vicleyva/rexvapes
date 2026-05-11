@@ -115,6 +115,21 @@ export default function History() {
 
       if (fetchError) throw fetchError
 
+      // Log cancellation first
+      const { error: cancelError } = await supabase
+        .from('cancellations')
+        .insert({
+          original_sale_id: sale.id,
+          flavor_id: sale.flavor_id,
+          quantity: sale.quantity,
+          price: sale.price,
+          total: sale.total,
+          original_sold_at: sale.sold_at,
+          notes: sale.notes
+        })
+
+      if (cancelError) throw cancelError
+
       // Restore stock
       const newStock = (flavorData?.stock || 0) + sale.quantity
       const { error: updateError } = await supabase
