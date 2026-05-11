@@ -49,7 +49,9 @@ export default function Availability() {
   }, [])
 
   const getFlavorsByModel = (modelId) => {
-    return flavors.filter(f => f.model_id === modelId)
+    return flavors
+      .filter(f => f.model_id === modelId)
+      .sort((a, b) => (b.stock > 0) - (a.stock > 0)) // Available first, then out of stock
   }
 
   const formatTime = (date) => {
