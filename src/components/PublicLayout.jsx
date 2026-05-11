@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { LogIn, Moon, Sun } from 'lucide-react'
 
+const APP_VERSION = 'v1.0.3'
+
 export default function PublicLayout({ children }) {
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('rexvapes_darkmode')
@@ -37,12 +39,13 @@ export default function PublicLayout({ children }) {
                 <Moon className="w-5 h-5 text-gray-600" />
               )}
             </button>
+            <span className="text-xs text-gray-400 dark:text-gray-500">{APP_VERSION}</span>
             <Link
               to="/login"
               className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
             >
               <LogIn className="w-4 h-4" />
-              Admin
+              Login
             </Link>
           </div>
         </div>
