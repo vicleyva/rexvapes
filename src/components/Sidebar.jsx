@@ -11,9 +11,11 @@ import {
   LogOut,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -24,7 +26,7 @@ const navItems = [
   { path: '/settings', label: 'Configuración', icon: Settings },
 ]
 
-export default function Sidebar({ darkMode }) {
+export default function Sidebar({ darkMode, collapsed, onCollapse }) {
   const { signOut } = useAuth()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -33,37 +35,42 @@ export default function Sidebar({ darkMode }) {
     await signOut()
   }
 
-  const SidebarContent = () => (
+  const SidebarContent = ({ isCollapsed = false, showCollapseBtn = false }) => (
     <>
       {/* Logo */}
-      <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-        <Link to="/dashboard" className="flex items-center gap-3">
-          <Wind className="w-10 h-10 text-blue-500 dark:text-blue-400" />
-          <div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-              REXVAPES
-            </span>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Admin Panel</p>
-          </div>
+      <div className={`border-b border-gray-100 dark:border-gray-700 ${isCollapsed ? 'p-4' : 'p-6'}`}>
+        <Link to="/dashboard" className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+          <Wind className={`text-blue-500 dark:text-blue-400 ${isCollapsed ? 'w-8 h-8' : 'w-10 h-10'}`} />
+          {!isCollapsed && (
+            <div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                REXVAPES
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Admin Panel</p>
+            </div>
+          )}
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
+      <nav className={`flex-1 ${isCollapsed ? 'p-2' : 'p-4'}`}>
         <ul className="space-y-1">
           {navItems.map(({ path, label, icon: Icon }) => (
             <li key={path}>
               <Link
                 to={path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                title={isCollapsed ? label : undefined}
+                className={`flex items-center rounded-xl text-sm font-medium transition-all ${
+                  isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'
+                } ${
                   location.pathname === path
                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/30'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                {label}
+                {!isCollapsed && label}
               </Link>
             </li>
           ))}
@@ -71,21 +78,40 @@ export default function Sidebar({ darkMode }) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-100 dark:border-gray-700 space-y-2">
+      <div className={`border-t border-gray-100 dark:border-gray-700 space-y-2 ${isCollapsed ? 'p-2' : 'p-4'}`}>
         <Link
           to="/"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          title={isCollapsed ? 'Ver Tienda' : undefined}
+          className={`flex items-center rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+            isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'
+          }`}
         >
           <ExternalLink className="w-5 h-5" />
-          Ver Tienda
+          {!isCollapsed && 'Ver Tienda'}
         </Link>
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          title={isCollapsed ? 'Cerrar Sesión' : undefined}
+          className={`w-full flex items-center rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ${
+            isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'
+          }`}
         >
           <LogOut className="w-5 h-5" />
-          Cerrar Sesión
+          {!isCollapsed && 'Cerrar Sesión'}
         </button>
+
+        {/* Collapse button */}
+        {showCollapseBtn && (
+          <button
+            onClick={onCollapse}
+            className={`w-full flex items-center rounded-xl text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+              isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'
+            }`}
+          >
+            {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            {!isCollapsed && 'Colapsar'}
+          </button>
+        )}
       </div>
     </>
   )
@@ -93,8 +119,10 @@ export default function Sidebar({ darkMode }) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm">
-        <SidebarContent />
+      <aside className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300 ${
+        collapsed ? 'lg:w-20' : 'lg:w-64'
+      }`}>
+        <SidebarContent isCollapsed={collapsed} showCollapseBtn={true} />
       </aside>
 
       {/* Mobile Header */}

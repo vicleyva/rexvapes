@@ -8,6 +8,11 @@ export default function Layout({ children }) {
     return saved === 'true'
   })
 
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('rexvapes_sidebar_collapsed')
+    return saved === 'true'
+  })
+
   useEffect(() => {
     localStorage.setItem('rexvapes_darkmode', darkMode)
     if (darkMode) {
@@ -17,9 +22,17 @@ export default function Layout({ children }) {
     }
   }, [darkMode])
 
+  useEffect(() => {
+    localStorage.setItem('rexvapes_sidebar_collapsed', collapsed)
+  }, [collapsed])
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
-      <Sidebar darkMode={darkMode} />
+      <Sidebar
+        darkMode={darkMode}
+        collapsed={collapsed}
+        onCollapse={() => setCollapsed(!collapsed)}
+      />
 
       {/* Dark mode toggle - fixed position */}
       <button
@@ -35,7 +48,7 @@ export default function Layout({ children }) {
       </button>
 
       {/* Main content */}
-      <main className="lg:pl-64 pt-16 lg:pt-0">
+      <main className={`pt-16 lg:pt-0 transition-all duration-300 ${collapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
         <div className="max-w-7xl mx-auto px-4 py-6">
           {children}
         </div>
