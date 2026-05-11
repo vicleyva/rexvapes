@@ -53,13 +53,10 @@ export default function History() {
   }
 
   const filteredSales = sales.filter(sale => {
-    const saleDate = new Date(sale.sold_at)
-    if (dateFrom && saleDate < new Date(dateFrom)) return false
-    if (dateTo) {
-      const endDate = new Date(dateTo)
-      endDate.setHours(23, 59, 59, 999)
-      if (saleDate > endDate) return false
-    }
+    // Compare dates in local timezone (YYYY-MM-DD format)
+    const saleLocalDate = new Date(sale.sold_at).toLocaleDateString('en-CA')
+    if (dateFrom && saleLocalDate < dateFrom) return false
+    if (dateTo && saleLocalDate > dateTo) return false
     return true
   })
 
