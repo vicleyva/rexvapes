@@ -63,17 +63,17 @@ export default function Availability() {
     <div>
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Disponibilidad</h1>
-        <p className="text-gray-600">Consulta nuestros sabores disponibles</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Disponibilidad</h1>
+        <p className="text-gray-600 dark:text-gray-400">Consulta nuestros sabores disponibles</p>
         <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={fetchData}
-            className="flex items-center gap-2 text-sm text-blue-500 hover:text-blue-600"
+            className="flex items-center gap-2 text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400"
           >
             <RefreshCw className="w-4 h-4" />
             Actualizar
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 dark:text-gray-400">
             Actualizado: {formatTime(lastUpdated)}
           </span>
         </div>
@@ -87,22 +87,22 @@ export default function Availability() {
         return (
           <div key={model.id} className="mb-8">
             {/* Model header */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{model.name}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{model.name}</h2>
                   {model.puffs && (
-                    <p className="text-sm text-gray-500">{model.puffs} puffs</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{model.puffs} puffs</p>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-blue-500">${model.price}</p>
-                  <p className="text-sm text-gray-500">MXN</p>
+                  <p className="text-2xl font-bold text-blue-500 dark:text-blue-400">${model.price}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">MXN</p>
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <span className="text-sm text-gray-600">
-                  <span className="font-semibold text-green-600">{availableCount}</span> de {modelFlavors.length} sabores disponibles
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-semibold text-green-600 dark:text-green-400">{availableCount}</span> de {modelFlavors.length} sabores disponibles
                 </span>
               </div>
             </div>
@@ -115,21 +115,21 @@ export default function Availability() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 py-8">No hay sabores registrados para este modelo</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No hay sabores registrados para este modelo</p>
             )}
           </div>
         )
       })}
 
       {models.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
-          <p className="text-gray-500">No hay productos disponibles por el momento</p>
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <p className="text-gray-500 dark:text-gray-400">No hay productos disponibles por el momento</p>
         </div>
       )}
 
       {/* Contact section */}
-      <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto</h3>
+      <div className="mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contacto</h3>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="https://wa.me/528120187524"
@@ -140,7 +140,7 @@ export default function Availability() {
             <MessageCircle className="w-5 h-5" />
             WhatsApp
           </a>
-          <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <MapPin className="w-5 h-5" />
             <span>Monterrey, NL</span>
           </div>
