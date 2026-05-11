@@ -1,29 +1,36 @@
 import { useState, useEffect } from 'react'
-import { X, ShoppingCart, Minus, Plus } from 'lucide-react'
+import { X, ShoppingCart, Minus, Plus, Gift } from 'lucide-react'
 
 export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm }) {
   const [quantity, setQuantity] = useState(1)
   const [notes, setNotes] = useState('')
+  const [isInternalUse, setIsInternalUse] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       setQuantity(1)
       setNotes('')
+      setIsInternalUse(false)
     }
   }, [isOpen])
 
   if (!isOpen || !flavor || !model) return null
 
   const maxQty = flavor.stock
-  const total = quantity * model.price
+  const price = isInternalUse ? 0 : model.price
+  const total = quantity * price
 
   const handleConfirm = () => {
+    const finalNotes = isInternalUse
+      ? `[USO INTERNO] ${notes.trim()}`.trim()
+      : notes.trim() || null
+
     onConfirm({
       flavor_id: flavor.id,
       quantity,
-      price: model.price,
+      price,
       total,
-      notes: notes.trim() || null
+      notes: finalNotes
     })
   }
 
@@ -71,14 +78,41 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+          {/* Internal use toggle */}
+          <button
+            type="button"
+            onClick={() => setIsInternalUse(!isInternalUse)}
+            className={`w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all ${
+              isInternalUse
+                ? 'bg-orange-50 dark:bg-orange-900/30 border-orange-300 dark:border-orange-600'
+                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Gift className={`w-5 h-5 ${isInternalUse ? 'text-orange-500' : 'text-gray-400'}`} />
+              <span className={`font-medium ${isInternalUse ? 'text-orange-700 dark:text-orange-300' : 'text-gray-700 dark:text-gray-300'}`}>
+                Uso interno (gratis)
+              </span>
+            </div>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              isInternalUse
+                ? 'bg-orange-500 border-orange-500'
+                : 'border-gray-300 dark:border-gray-500'
+            }`}>
+              {isInternalUse && <div className="w-2 h-2 bg-white rounded-full" />}
+            </div>
+          </button>
+
+          <div className={`rounded-xl p-4 ${isInternalUse ? 'bg-orange-50 dark:bg-orange-900/20' : 'bg-gray-50 dark:bg-gray-700'}`}>
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
               <span>Precio unitario:</span>
-              <span>${model.price} MXN</span>
+              <span className={isInternalUse ? 'line-through' : ''}>${model.price} MXN</span>
             </div>
             <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white">
               <span>Total:</span>
-              <span className="text-blue-500 dark:text-blue-400">${total} MXN</span>
+              <span className={isInternalUse ? 'text-orange-500 dark:text-orange-400' : 'text-blue-500 dark:text-blue-400'}>
+                ${total} MXN {isInternalUse && '(Gratis)'}
+              </span>
             </div>
           </div>
 
