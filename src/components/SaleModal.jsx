@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, ShoppingCart, Minus, Plus, Tag } from 'lucide-react'
+import ClientSelector from './ClientSelector'
 
 export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm }) {
   const [quantity, setQuantity] = useState(1)
@@ -7,6 +8,7 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
   const [isInternalUse, setIsInternalUse] = useState(false)
   const [isCustomPrice, setIsCustomPrice] = useState(false)
   const [customPrice, setCustomPrice] = useState('')
+  const [clientId, setClientId] = useState(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -15,6 +17,7 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
       setIsInternalUse(false)
       setIsCustomPrice(false)
       setCustomPrice('')
+      setClientId(null)
     }
   }, [isOpen])
 
@@ -56,7 +59,8 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
       quantity,
       price,
       total,
-      notes: finalNotes || null
+      notes: finalNotes || null,
+      client_id: clientId
     })
   }
 
@@ -103,6 +107,9 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
               </button>
             </div>
           </div>
+
+          {/* Client selector */}
+          <ClientSelector value={clientId} onChange={setClientId} />
 
           {/* Price options */}
           <div className="flex gap-2">

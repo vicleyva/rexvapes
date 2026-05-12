@@ -9,7 +9,8 @@ import {
   TrendingUp,
   Plus,
   ArrowRight,
-  CalendarClock
+  CalendarClock,
+  Wallet
 } from 'lucide-react'
 
 export default function Dashboard() {
@@ -18,7 +19,11 @@ export default function Dashboard() {
     totalFlavors: 0,
     todaySales: 0,
     todayRevenue: 0,
+    todayCost: 0,
+    todayProfit: 0,
     weekRevenue: 0,
+    weekCost: 0,
+    weekProfit: 0,
     totalReserved: 0
   })
   const [lowStockItems, setLowStockItems] = useState([])
@@ -64,14 +69,21 @@ export default function Dashboard() {
 
       const { data: todaySales } = await supabase
         .from('sales')
-        .select('quantity, total')
+        .select('quantity, total, flavors(model_id, models(cost))')
         .gte('sold_at', today.toISOString())
 
       if (todaySales) {
+        const todayRevenue = todaySales.reduce((sum, s) => sum + parseFloat(s.total), 0)
+        const todayCost = todaySales.reduce((sum, s) => {
+          const modelCost = s.flavors?.models?.cost || 0
+          return sum + (s.quantity * modelCost)
+        }, 0)
         setStats(prev => ({
           ...prev,
           todaySales: todaySales.reduce((sum, s) => sum + s.quantity, 0),
-          todayRevenue: todaySales.reduce((sum, s) => sum + parseFloat(s.total), 0)
+          todayRevenue,
+          todayCost,
+          todayProfit: todayRevenue - todayCost
         }))
       }
 
@@ -80,13 +92,20 @@ export default function Dashboard() {
 
       const { data: weekSales } = await supabase
         .from('sales')
-        .select('total')
+        .select('quantity, total, flavors(model_id, models(cost))')
         .gte('sold_at', weekAgo.toISOString())
 
       if (weekSales) {
+        const weekRevenue = weekSales.reduce((sum, s) => sum + parseFloat(s.total), 0)
+        const weekCost = weekSales.reduce((sum, s) => {
+          const modelCost = s.flavors?.models?.cost || 0
+          return sum + (s.quantity * modelCost)
+        }, 0)
         setStats(prev => ({
           ...prev,
-          weekRevenue: weekSales.reduce((sum, s) => sum + parseFloat(s.total), 0)
+          weekRevenue,
+          weekCost,
+          weekProfit: weekRevenue - weekCost
         }))
       }
     } catch (error) {
@@ -148,24 +167,28 @@ export default function Dashboard() {
 
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stats.todayProfit >= 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+              <Wallet className={`w-5 h-5 ${stats.todayProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`} />
             </div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Ingresos Hoy</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Ganancia Hoy</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.todayRevenue}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">MXN</p>
+          <p className={`text-3xl font-bold ${stats.todayProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+            ${stats.todayProfit}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Ventas: ${stats.todayRevenue}</p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-cyan-500 dark:text-cyan-400" />
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stats.weekProfit >= 0 ? 'bg-cyan-100 dark:bg-cyan-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+              <TrendingUp className={`w-5 h-5 ${stats.weekProfit >= 0 ? 'text-cyan-500 dark:text-cyan-400' : 'text-red-500 dark:text-red-400'}`} />
             </div>
             <span className="text-sm text-gray-600 dark:text-gray-400">Semana</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.weekRevenue}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">MXN (7 días)</p>
+          <p className={`text-3xl font-bold ${stats.weekProfit >= 0 ? 'text-cyan-600 dark:text-cyan-400' : 'text-red-600 dark:text-red-400'}`}>
+            ${stats.weekProfit}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Ventas: ${stats.weekRevenue} (7 días)</p>
         </div>
 
         <Link to="/reservations" className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">

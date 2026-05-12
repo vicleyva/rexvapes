@@ -27,6 +27,7 @@ rexvapes/
 ├── src/
 │   ├── components/
 │   │   ├── AvailabilityCard.jsx
+│   │   ├── ClientSelector.jsx  # Client search/create dropdown
 │   │   ├── FlavorCard.jsx
 │   │   ├── Layout.jsx       # Protected layout (sidebar + dark mode)
 │   │   ├── LowStockAlert.jsx
@@ -44,7 +45,7 @@ rexvapes/
 │   │   ├── public/
 │   │   │   └── Availability.jsx  # Public stock check (/)
 │   │   ├── Dashboard.jsx    # KPIs overview
-│   │   ├── History.jsx      # Transaction history (default today)
+│   │   ├── History.jsx      # Transaction history (default 7 days)
 │   │   ├── Inventory.jsx    # Stock management + filters
 │   │   ├── Login.jsx        # Auth page (dark mode)
 │   │   ├── Reports.jsx      # Analytics
@@ -72,6 +73,7 @@ rexvapes/
 |-------|---------|
 | `models` | Vape device models (name, puffs, price) |
 | `flavors` | Flavors per model (stock, min_stock) |
+| `clients` | Customer tracking (name, phone) |
 | `sales` | Sales records (quantity, price, total) |
 | `restocks` | Restock records (quantity, cost) |
 | `cancellations` | Cancelled sales log |
@@ -85,11 +87,17 @@ rexvapes/
 **flavors**
 - `id` (UUID), `model_id` (FK), `name`, `name_es`, `stock`, `min_stock`, `is_active`
 
+**clients**
+- `id` (UUID), `name`, `phone`, `notes`, `created_at`, `created_by`
+
 **sales**
-- `id` (UUID), `flavor_id` (FK), `quantity`, `price`, `total`, `sold_at`, `notes`
+- `id` (UUID), `flavor_id` (FK), `client_id` (FK, nullable), `quantity`, `price`, `total`, `sold_at`, `notes`
 
 **restocks**
 - `id` (UUID), `flavor_id` (FK), `quantity`, `cost`, `restocked_at`, `notes`
+
+**reservations**
+- `id` (UUID), `flavor_id` (FK), `client_id` (FK), `quantity`, `price`, `delivery_date`, `status`, `notes`
 
 ### Row Level Security
 
@@ -280,7 +288,7 @@ if (l.search[1] === '/' ) {
 7. **Custom Price/Discount** - Apply discounts with savings display (green toggle)
 8. **Collapsible Sidebar** - Toggle between full (256px) and icon-only (80px) modes
 9. **Inventory Filters** - Filter by: Todos | Con stock | Agotados
-10. **History Date Default** - Defaults to today's date
+10. **History Date Default** - Defaults to last 7 days
 11. **Cancel Sale** - X button on History to cancel sale and restore stock
 12. **Version Display** - Shows version on public page to verify deployments
 13. **Reservations** - Reserve items for future delivery (sale created on payment, not delivery)
@@ -289,6 +297,7 @@ if (l.search[1] === '/' ) {
 16. **Profit Tracking** - Model cost field enables profit/margin calculations
 17. **Margin Column** - History and Reservations show profit/loss per transaction (green/red)
 18. **Promo Fullscreen** - Escape key exits, responsive mobile layout
+19. **Client Tracking** - Unified clients table for sales and reservations with search/create
 
 ---
 

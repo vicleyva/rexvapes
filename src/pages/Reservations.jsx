@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift, DollarSign, History } from 'lucide-react'
 import Swal from 'sweetalert2'
+import ClientSelector from '../components/ClientSelector'
 
 export default function Reservations() {
   const { user } = useAuth()
@@ -19,7 +20,7 @@ export default function Reservations() {
   const [selectedFlavor, setSelectedFlavor] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [deliveryDate, setDeliveryDate] = useState('')
-  const [customerName, setCustomerName] = useState('')
+  const [clientId, setClientId] = useState(null)
   const [notes, setNotes] = useState('')
   const [isInternalUse, setIsInternalUse] = useState(false)
   const [isCustomPrice, setIsCustomPrice] = useState(false)
@@ -47,6 +48,11 @@ export default function Reservations() {
                 name,
                 price
               )
+            ),
+            clients (
+              id,
+              name,
+              phone
             )
           `)
           .eq('status', 'active')
@@ -65,6 +71,11 @@ export default function Reservations() {
                 name,
                 price
               )
+            ),
+            clients (
+              id,
+              name,
+              phone
             )
           `)
           .eq('status', 'completed')
@@ -110,7 +121,7 @@ export default function Reservations() {
     setSelectedFlavor('')
     setQuantity(1)
     setDeliveryDate('')
-    setCustomerName('')
+    setClientId(null)
     setNotes('')
     setIsInternalUse(false)
     setIsCustomPrice(false)
@@ -119,6 +130,16 @@ export default function Reservations() {
 
   const handleCreate = async (e) => {
     e.preventDefault()
+
+    if (!clientId) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Cliente requerido',
+        text: 'Selecciona o crea un cliente',
+        confirmButtonColor: '#3b82f6'
+      })
+      return
+    }
 
     const available = getAvailableStock(selectedFlavor)
     if (quantity > available) {
@@ -148,7 +169,7 @@ export default function Reservations() {
           flavor_id: selectedFlavor,
           quantity,
           delivery_date: deliveryDate,
-          customer_name: customerName,
+          client_id: clientId,
           reserved_by: user?.email,
           notes: finalNotes || null,
           price: finalPrice
@@ -177,11 +198,12 @@ export default function Reservations() {
   }
 
   const handleDeliver = async (reservation) => {
+    const clientName = reservation.clients?.name || reservation.customer_name || 'Sin cliente'
     const result = await Swal.fire({
       title: '¿Entregar producto?',
       html: `
         <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
-        <p>Cliente: <strong>${reservation.customer_name}</strong></p>
+        <p>Cliente: <strong>${clientName}</strong></p>
         <p class="text-sm text-gray-500 mt-2">El producto se marcará como entregado.<br/>La venta se registra al recibir el pago.</p>
       `,
       icon: 'question',
@@ -224,11 +246,12 @@ export default function Reservations() {
   }
 
   const handleCancel = async (reservation) => {
+    const clientName = reservation.clients?.name || reservation.customer_name || 'Sin cliente'
     const result = await Swal.fire({
       title: '¿Cancelar reservación?',
       html: `
         <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
-        <p>Cliente: <strong>${reservation.customer_name}</strong></p>
+        <p>Cliente: <strong>${clientName}</strong></p>
       `,
       icon: 'warning',
       showCancelButton: true,
@@ -268,12 +291,13 @@ export default function Reservations() {
     if (newPaidStatus) {
       const price = reservation.price ?? reservation.flavors?.models?.price ?? 0
       const total = reservation.quantity * price
+      const clientName = reservation.clients?.name || reservation.customer_name || 'Sin cliente'
 
       const result = await Swal.fire({
         title: '¿Confirmar pago?',
         html: `
           <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
-          <p>Cliente: <strong>${reservation.customer_name}</strong></p>
+          <p>Cliente: <strong>${clientName}</strong></p>
           <p class="text-lg font-bold text-green-600 mt-2">Total: $${total}</p>
           <p class="text-sm text-gray-500 mt-2">Se registrará la venta y se descontará del stock.</p>
         `,
@@ -296,8 +320,9 @@ export default function Reservations() {
             quantity: reservation.quantity,
             price: price,
             total: total,
-            notes: `[RESERVACIÓN] Cliente: ${reservation.customer_name}${reservation.notes ? ' - ' + reservation.notes : ''}`,
-            sold_by: user?.email
+            notes: `[RESERVACIÓN]${reservation.notes ? ' ' + reservation.notes : ''}`,
+            sold_by: user?.email,
+            client_id: reservation.client_id
           })
 
         if (saleError) throw saleError
@@ -537,7 +562,8 @@ export default function Reservations() {
                   </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      <strong className="text-gray-900 dark:text-white">{reservation.customer_name}</strong>
+                      <strong className="text-gray-900 dark:text-white">{reservation.clients?.name || reservation.customer_name || 'Sin cliente'}</strong>
+                      {reservation.clients?.phone && <span className="ml-2 text-gray-500">({reservation.clients.phone})</span>}
                     </span>
                     <span className={`font-medium ${
                       isOverdue(reservation.delivery_date)
@@ -625,7 +651,7 @@ export default function Reservations() {
                     {completedReservations.map(r => (
                       <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                          {r.customer_name}
+                          {r.clients?.name || r.customer_name || '-'}
                         </td>
                         <td className="px-4 py-3">
                           <p className="text-sm text-gray-900 dark:text-white">{r.flavors?.name}</p>
@@ -813,19 +839,7 @@ export default function Reservations() {
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Nombre del cliente
-                </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Nombre del cliente"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <ClientSelector value={clientId} onChange={setClientId} required />
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

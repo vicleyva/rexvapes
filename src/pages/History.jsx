@@ -13,10 +13,12 @@ export default function History() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('sales') // 'sales' or 'cancellations'
 
-  // Default to today's date (local timezone)
-  const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD format
-  const [dateFrom, setDateFrom] = useState(today)
-  const [dateTo, setDateTo] = useState(today)
+  // Default to last 7 days (local timezone)
+  const today = new Date()
+  const weekAgo = new Date(today)
+  weekAgo.setDate(weekAgo.getDate() - 7)
+  const [dateFrom, setDateFrom] = useState(weekAgo.toLocaleDateString('en-CA'))
+  const [dateTo, setDateTo] = useState(today.toLocaleDateString('en-CA'))
   const [filterModel, setFilterModel] = useState('')
   const [filterFlavor, setFilterFlavor] = useState('')
 
@@ -44,10 +46,10 @@ export default function History() {
       flavorsData?.forEach(f => { flavorsMap[f.id] = f })
       setFlavors(flavorsMap)
 
-      // Fetch sales
+      // Fetch sales with client info
       const { data: salesData } = await supabase
         .from('sales')
-        .select('*')
+        .select('*, clients(id, name, phone)')
         .order('sold_at', { ascending: false })
         .limit(100)
 
@@ -416,6 +418,7 @@ export default function History() {
                 <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Fecha</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Cliente</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Modelo</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
@@ -434,6 +437,9 @@ export default function History() {
                       <tr key={sale.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                           {formatDate(sale.sold_at)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                          {sale.clients?.name || '-'}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                           {model?.name || ''}
