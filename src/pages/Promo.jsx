@@ -124,11 +124,23 @@ export default function Promo() {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null,
+        backgroundColor: '#1f2937',
         logging: false,
-        onclone: (clonedDoc) => {
-          // Convert images to avoid CORS issues
-          const images = clonedDoc.querySelectorAll('img')
+        removeContainer: true,
+        onclone: (clonedDoc, element) => {
+          // Fix oklab color issue - replace with simple colors
+          const allElements = element.querySelectorAll('*')
+          allElements.forEach(el => {
+            const computed = window.getComputedStyle(el)
+            if (computed.color.includes('oklab')) {
+              el.style.color = '#ffffff'
+            }
+            if (computed.backgroundColor.includes('oklab')) {
+              el.style.backgroundColor = 'transparent'
+            }
+          })
+          // Fix images CORS
+          const images = element.querySelectorAll('img')
           images.forEach(img => {
             img.crossOrigin = 'anonymous'
           })
