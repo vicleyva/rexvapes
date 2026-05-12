@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { MessageCircle, Copy, Check, RefreshCw, Image, FileText } from 'lucide-react'
+import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette } from 'lucide-react'
+
+const GRADIENTS = [
+  { id: 'sunset', name: 'Sunset', class: 'from-purple-600 via-pink-500 to-orange-400' },
+  { id: 'ocean', name: 'Ocean', class: 'from-cyan-500 via-blue-500 to-purple-600' },
+  { id: 'fire', name: 'Fire', class: 'from-yellow-400 via-orange-500 to-red-600' },
+  { id: 'forest', name: 'Forest', class: 'from-green-400 via-emerald-500 to-teal-600' },
+  { id: 'candy', name: 'Candy', class: 'from-pink-400 via-purple-500 to-indigo-600' },
+  { id: 'midnight', name: 'Midnight', class: 'from-slate-900 via-purple-900 to-slate-900' },
+  { id: 'lime', name: 'Lime', class: 'from-lime-400 via-green-500 to-emerald-600' },
+  { id: 'berry', name: 'Berry', class: 'from-rose-500 via-fuchsia-500 to-violet-600' },
+]
 
 export default function Promo() {
   const [models, setModels] = useState([])
@@ -10,6 +21,7 @@ export default function Promo() {
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState('visual') // 'visual' or 'text'
+  const [selectedGradient, setSelectedGradient] = useState(GRADIENTS[0])
 
   useEffect(() => {
     fetchData()
@@ -176,51 +188,71 @@ export default function Promo() {
       <div className="flex-1 min-h-0 overflow-y-auto">
         {activeTab === 'visual' ? (
           /* Visual Promo Card - Screenshot ready */
-          <div className="flex justify-center">
-            <div
-              id="promo-card"
-              className="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-3xl p-6 max-w-md w-full shadow-2xl"
-            >
-              {/* Logo */}
-              <div className="flex justify-center mb-4">
-                <img
-                  src={import.meta.env.BASE_URL + "logo.png"}
-                  alt="Rex Vapes"
-                  className="w-32 h-32 object-contain drop-shadow-lg"
+          <div className="space-y-4">
+            {/* Gradient selector */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Palette className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              {GRADIENTS.map(g => (
+                <button
+                  key={g.id}
+                  onClick={() => setSelectedGradient(g)}
+                  title={g.name}
+                  className={`w-8 h-8 rounded-full bg-gradient-to-br ${g.class} transition-all ${
+                    selectedGradient.id === g.id
+                      ? 'ring-2 ring-offset-2 ring-blue-500 scale-110'
+                      : 'hover:scale-105'
+                  }`}
                 />
-              </div>
+              ))}
+            </div>
 
-              {/* Model info */}
-              <div className="text-center mb-4">
-                <h2 className="text-3xl font-bold text-white drop-shadow-lg">
-                  {selectedModel?.name || 'Selecciona modelo'}
-                </h2>
-                {selectedModel?.puffs && (
-                  <p className="text-white/90 text-lg">💨 {selectedModel.puffs} puffs</p>
-                )}
-                <p className="text-4xl font-bold text-yellow-300 drop-shadow-lg mt-2">
-                  ${selectedModel?.price || '---'} MXN
-                </p>
-              </div>
-
-              {/* Flavors */}
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-                <h3 className="text-white font-bold text-center mb-3">
-                  ✅ Sabores disponibles ({availableFlavors.length})
-                </h3>
-                <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto">
-                  {availableFlavors.map(f => (
-                    <div key={f.id} className="text-white/90 text-sm py-1 px-2">
-                      • {f.name_es || f.name}
-                    </div>
-                  ))}
+            {/* Promo card */}
+            <div className="flex justify-center">
+              <div
+                id="promo-card"
+                className={`bg-gradient-to-br ${selectedGradient.class} rounded-3xl p-6 max-w-2xl w-full shadow-2xl`}
+              >
+                {/* Logo */}
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={import.meta.env.BASE_URL + "logo.png"}
+                    alt="Rex Vapes"
+                    className="w-28 h-28 object-contain drop-shadow-lg"
+                  />
                 </div>
-              </div>
 
-              {/* Footer */}
-              <div className="mt-4 text-center">
-                <p className="text-white/90 text-sm">📍 Monterrey, NL</p>
-                <p className="text-white font-bold text-lg mt-1">📲 ¡Escríbenos!</p>
+                {/* Model info */}
+                <div className="text-center mb-4">
+                  <h2 className="text-3xl font-bold text-white drop-shadow-lg">
+                    {selectedModel?.name || 'Selecciona modelo'}
+                  </h2>
+                  {selectedModel?.puffs && (
+                    <p className="text-white/90 text-lg">💨 {selectedModel.puffs} puffs</p>
+                  )}
+                  <p className="text-4xl font-bold text-yellow-300 drop-shadow-lg mt-2">
+                    ${selectedModel?.price || '---'} MXN
+                  </p>
+                </div>
+
+                {/* Flavors */}
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+                  <h3 className="text-white font-bold text-center mb-3">
+                    ✅ Sabores disponibles ({availableFlavors.length})
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1">
+                    {availableFlavors.map(f => (
+                      <div key={f.id} className="text-white/90 text-sm py-1 px-2">
+                        • {f.name_es || f.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="mt-4 text-center">
+                  <p className="text-white/90 text-sm">📍 Monterrey, NL</p>
+                  <p className="text-white font-bold text-lg mt-1">📲 ¡Escríbenos!</p>
+                </div>
               </div>
             </div>
           </div>
