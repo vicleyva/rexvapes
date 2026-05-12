@@ -93,8 +93,19 @@ rexvapes/
 
 ### Row Level Security
 
-- **Public**: Can read active models and flavors (for availability page)
+- **Public (anon)**: Can read active models, flavors, and **active reservations** (for availability page)
 - **Authenticated**: Full access to all tables
+
+**IMPORTANT**: The `reservations` table needs an RLS policy for anonymous users, otherwise the public Availability page won't subtract reserved items from stock.
+
+```sql
+-- Required policy for public Availability page
+CREATE POLICY "Allow anonymous read active reservations"
+ON reservations
+FOR SELECT
+TO anon
+USING (status = 'active');
+```
 
 ---
 
@@ -143,7 +154,7 @@ rm -rf node_modules package-lock.json && npm install
 
 ## Versioning
 
-**Current Version**: `v1.2.8`
+**Current Version**: `v1.3.6`
 
 **Location**: `src/components/Sidebar.jsx` and `src/components/PublicLayout.jsx` → `APP_VERSION` constant
 
@@ -272,7 +283,7 @@ if (l.search[1] === '/' ) {
 10. **History Date Default** - Defaults to today's date
 11. **Cancel Sale** - X button on History to cancel sale and restore stock
 12. **Version Display** - Shows version on public page to verify deployments
-13. **Reservations** - Reserve items for future delivery (auto-creates sale on delivery)
+13. **Reservations** - Reserve items for future delivery (sale created on payment, not delivery)
 14. **Available Stock** - Stock minus reserved shown across Inventory, Sales, Availability
 15. **History Type Column** - Shows badges for internal use (orange) and discount (green)
 
