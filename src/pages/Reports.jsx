@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { BarChart3, TrendingUp, Package, AlertTriangle } from 'lucide-react'
+import { BarChart3, TrendingUp, Package, AlertTriangle, DollarSign, ShoppingCart, Wallet } from 'lucide-react'
 
 export default function Reports() {
   const [topFlavors, setTopFlavors] = useState([])
@@ -8,6 +8,7 @@ export default function Reports() {
   const [lowStockItems, setLowStockItems] = useState([])
   const [models, setModels] = useState({})
   const [flavors, setFlavors] = useState({})
+  const [financials, setFinancials] = useState({ revenue: 0, costs: 0, profit: 0, unitsSold: 0, unitsRestocked: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -36,10 +37,23 @@ export default function Reports() {
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-      const { data: salesData } = await supabase
-        .from('sales')
-        .select('*')
-        .gte('sold_at', thirtyDaysAgo.toISOString())
+      const [{ data: salesData }, { data: restocksData }] = await Promise.all([
+        supabase.from('sales').select('*').gte('sold_at', thirtyDaysAgo.toISOString()),
+        supabase.from('restocks').select('*').gte('created_at', thirtyDaysAgo.toISOString())
+      ])
+
+      // Calculate financials (30 days)
+      const totalRevenue = salesData?.reduce((sum, s) => sum + parseFloat(s.total || 0), 0) || 0
+      const totalCosts = restocksData?.reduce((sum, r) => sum + parseFloat(r.cost || 0), 0) || 0
+      const unitsSold = salesData?.reduce((sum, s) => sum + (s.quantity || 0), 0) || 0
+      const unitsRestocked = restocksData?.reduce((sum, r) => sum + (r.quantity || 0), 0) || 0
+      setFinancials({
+        revenue: totalRevenue,
+        costs: totalCosts,
+        profit: totalRevenue - totalCosts,
+        unitsSold,
+        unitsRestocked
+      })
 
       if (salesData) {
         // Top selling flavors
@@ -115,6 +129,56 @@ export default function Reports() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Reportes</h1>
+
+      {/* Financial Summary - 30 days */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Ventas</span>
+          </div>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">${financials.revenue.toFixed(0)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{financials.unitsSold} unidades</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <ShoppingCart className="w-4 h-4 text-red-600 dark:text-red-400" />
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Compras</span>
+          </div>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">${financials.costs.toFixed(0)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{financials.unitsRestocked} unidades</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`p-2 rounded-lg ${financials.profit >= 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+              <Wallet className={`w-4 h-4 ${financials.profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`} />
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Ganancia</span>
+          </div>
+          <p className={`text-xl font-bold ${financials.profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+            ${financials.profit.toFixed(0)}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {financials.revenue > 0 ? ((financials.profit / financials.revenue) * 100).toFixed(0) : 0}% margen
+          </p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Promedio</span>
+          </div>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">
+            ${financials.unitsSold > 0 ? (financials.revenue / financials.unitsSold).toFixed(0) : 0}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">por unidad vendida</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sales by day chart */}

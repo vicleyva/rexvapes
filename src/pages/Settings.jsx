@@ -7,7 +7,7 @@ export default function Settings() {
   const [flavors, setFlavors] = useState([])
   const [loading, setLoading] = useState(true)
   const [editingModel, setEditingModel] = useState(null)
-  const [newModel, setNewModel] = useState({ name: '', puffs: '', price: '' })
+  const [newModel, setNewModel] = useState({ name: '', puffs: '', price: '', cost: '' })
   const [showNewModel, setShowNewModel] = useState(false)
   const [editingFlavor, setEditingFlavor] = useState(null)
   const [newFlavor, setNewFlavor] = useState({ name: '', name_es: '', model_id: '' })
@@ -53,12 +53,13 @@ export default function Settings() {
       const { error } = await supabase.from('models').insert({
         name: newModel.name,
         puffs: newModel.puffs ? parseInt(newModel.puffs) : null,
-        price: parseFloat(newModel.price)
+        price: parseFloat(newModel.price),
+        cost: newModel.cost ? parseFloat(newModel.cost) : null
       })
 
       if (error) throw error
 
-      setNewModel({ name: '', puffs: '', price: '' })
+      setNewModel({ name: '', puffs: '', price: '', cost: '' })
       setShowNewModel(false)
       fetchData()
     } catch (error) {
@@ -76,7 +77,8 @@ export default function Settings() {
         .update({
           name: editingModel.name,
           puffs: editingModel.puffs,
-          price: editingModel.price
+          price: editingModel.price,
+          cost: editingModel.cost
         })
         .eq('id', editingModel.id)
 
@@ -215,7 +217,7 @@ export default function Settings() {
           {/* New model form */}
           {showNewModel && (
             <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
-              <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 <input
                   type="text"
                   placeholder="Nombre"
@@ -232,7 +234,14 @@ export default function Settings() {
                 />
                 <input
                   type="number"
-                  placeholder="Precio"
+                  placeholder="Costo compra"
+                  value={newModel.cost}
+                  onChange={(e) => setNewModel({ ...newModel, cost: e.target.value })}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+                <input
+                  type="number"
+                  placeholder="Precio venta"
                   value={newModel.price}
                   onChange={(e) => setNewModel({ ...newModel, price: e.target.value })}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -247,7 +256,7 @@ export default function Settings() {
                   Guardar
                 </button>
                 <button
-                  onClick={() => { setShowNewModel(false); setNewModel({ name: '', puffs: '', price: '' }) }}
+                  onClick={() => { setShowNewModel(false); setNewModel({ name: '', puffs: '', price: '', cost: '' }) }}
                   className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600"
                 >
                   <X className="w-4 h-4" />
@@ -262,23 +271,33 @@ export default function Settings() {
               <div key={model.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 {editingModel?.id === model.id ? (
                   <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
                         value={editingModel.name}
                         onChange={(e) => setEditingModel({ ...editingModel, name: e.target.value })}
+                        placeholder="Nombre"
                         className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                       <input
                         type="number"
                         value={editingModel.puffs || ''}
                         onChange={(e) => setEditingModel({ ...editingModel, puffs: e.target.value ? parseInt(e.target.value) : null })}
+                        placeholder="Puffs"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      />
+                      <input
+                        type="number"
+                        value={editingModel.cost || ''}
+                        onChange={(e) => setEditingModel({ ...editingModel, cost: e.target.value ? parseFloat(e.target.value) : null })}
+                        placeholder="Costo"
                         className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                       <input
                         type="number"
                         value={editingModel.price}
                         onChange={(e) => setEditingModel({ ...editingModel, price: parseFloat(e.target.value) })}
+                        placeholder="Precio"
                         className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                       />
                     </div>
@@ -305,8 +324,15 @@ export default function Settings() {
                         {model.puffs && `${model.puffs} puffs • `}${getModelFlavors(model.id).length} sabores
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-blue-500 dark:text-blue-400">${model.price}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-blue-500 dark:text-blue-400">${model.price}</p>
+                        {model.cost && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Costo: ${model.cost} • <span className="text-green-600 dark:text-green-400">+${model.price - model.cost}</span>
+                          </p>
+                        )}
+                      </div>
                       <button
                         onClick={() => setEditingModel(model)}
                         className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-purple-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"
