@@ -350,6 +350,9 @@ export default function Reservations() {
                     <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       ({reservation.flavors?.models?.name})
                     </span>
+                    <span className="font-bold text-blue-500 dark:text-blue-400 shrink-0">
+                      ${reservation.quantity * (reservation.flavors?.models?.price || 0)}
+                    </span>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
