@@ -6,6 +6,7 @@ import { MessageCircle, MapPin, RefreshCw, LayoutGrid, List, Check, X } from 'lu
 export default function Availability() {
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
+  const [reservations, setReservations] = useState([])
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [viewMode, setViewMode] = useState(() => {
@@ -20,22 +21,15 @@ export default function Availability() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      // Fetch models
-      const { data: modelsData } = await supabase
-        .from('models')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
-
-      // Fetch flavors
-      const { data: flavorsData } = await supabase
-        .from('flavors')
-        .select('*')
-        .eq('is_active', true)
-        .order('name')
+      const [{ data: modelsData }, { data: flavorsData }, { data: reservationsData }] = await Promise.all([
+        supabase.from('models').select('*').eq('is_active', true).order('name'),
+        supabase.from('flavors').select('*').eq('is_active', true).order('name'),
+        supabase.from('reservations').select('flavor_id, quantity').eq('status', 'active')
+      ])
 
       setModels(modelsData || [])
       setFlavors(flavorsData || [])
+      setReservations(reservationsData || [])
       setLastUpdated(new Date())
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -48,9 +42,19 @@ export default function Availability() {
     fetchData()
   }, [])
 
+  const getReservedQty = (flavorId) => {
+    return reservations
+      .filter(r => r.flavor_id === flavorId)
+      .reduce((sum, r) => sum + r.quantity, 0)
+  }
+
   const getFlavorsByModel = (modelId) => {
     return flavors
       .filter(f => f.model_id === modelId)
+      .map(f => ({
+        ...f,
+        stock: Math.max(0, f.stock - getReservedQty(f.id)) // Available = stock - reserved
+      }))
       .sort((a, b) => (b.stock > 0) - (a.stock > 0)) // Available first, then out of stock
   }
 
