@@ -96,7 +96,9 @@ export default function Reports() {
   }
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr)
+    // Parse YYYY-MM-DD as local time (not UTC)
+    const [year, month, day] = dateStr.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
     return date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' })
   }
 
