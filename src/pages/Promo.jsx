@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
-import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette } from 'lucide-react'
+import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette, Download } from 'lucide-react'
+import html2canvas from 'html2canvas'
 
 const GRADIENTS = [
   { id: 'sunset', name: 'Sunset', class: 'from-purple-600 via-pink-500 to-orange-400' },
@@ -22,6 +23,8 @@ export default function Promo() {
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState('visual') // 'visual' or 'text'
   const [selectedGradient, setSelectedGradient] = useState(GRADIENTS[0])
+  const [exporting, setExporting] = useState(false)
+  const promoCardRef = useRef(null)
 
   useEffect(() => {
     fetchData()
@@ -112,6 +115,26 @@ export default function Promo() {
     window.open(`https://wa.me/?text=${text}`, '_blank')
   }
 
+  const downloadPromoImage = async () => {
+    if (!promoCardRef.current) return
+    setExporting(true)
+    try {
+      const canvas = await html2canvas(promoCardRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null
+      })
+      const link = document.createElement('a')
+      link.download = `promo-${selectedModel?.name || 'rexvapes'}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (err) {
+      console.error('Error exporting:', err)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -181,27 +204,37 @@ export default function Promo() {
         {activeTab === 'visual' ? (
           /* Visual Promo Card - Screenshot ready */
           <div className="space-y-4">
-            {/* Gradient selector */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Palette className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              {GRADIENTS.map(g => (
-                <button
-                  key={g.id}
-                  onClick={() => setSelectedGradient(g)}
-                  title={g.name}
-                  className={`w-8 h-8 rounded-full bg-gradient-to-br ${g.class} transition-all ${
-                    selectedGradient.id === g.id
-                      ? 'ring-2 ring-offset-2 ring-blue-500 scale-110'
-                      : 'hover:scale-105'
-                  }`}
-                />
-              ))}
+            {/* Gradient selector + Download button */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Palette className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                {GRADIENTS.map(g => (
+                  <button
+                    key={g.id}
+                    onClick={() => setSelectedGradient(g)}
+                    title={g.name}
+                    className={`w-8 h-8 rounded-full bg-gradient-to-br ${g.class} transition-all ${
+                      selectedGradient.id === g.id
+                        ? 'ring-2 ring-offset-2 ring-blue-500 scale-110'
+                        : 'hover:scale-105'
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={downloadPromoImage}
+                disabled={exporting}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+              >
+                <Download className="w-4 h-4" />
+                {exporting ? 'Exportando...' : 'Descargar PNG'}
+              </button>
             </div>
 
             {/* Promo card */}
             <div className="flex justify-center">
               <div
-                id="promo-card"
+                ref={promoCardRef}
                 className={`bg-gradient-to-br ${selectedGradient.class} rounded-3xl p-6 max-w-3xl w-full shadow-2xl`}
               >
                 {/* Header: Logo left, Info right */}
