@@ -124,13 +124,21 @@ export default function Promo() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
-        logging: false
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Convert images to avoid CORS issues
+          const images = clonedDoc.querySelectorAll('img')
+          images.forEach(img => {
+            img.crossOrigin = 'anonymous'
+          })
+        }
       })
 
       // Convert to blob and download
       canvas.toBlob((blob) => {
         if (!blob) {
           console.error('Failed to create blob')
+          setExporting(false)
           return
         }
         const url = URL.createObjectURL(blob)
@@ -141,11 +149,11 @@ export default function Promo() {
         link.click()
         document.body.removeChild(link)
         URL.revokeObjectURL(url)
+        setExporting(false)
       }, 'image/png')
     } catch (err) {
       console.error('Error exporting:', err)
-      alert('Error al exportar imagen')
-    } finally {
+      alert('Error al exportar imagen: ' + err.message)
       setExporting(false)
     }
   }
@@ -259,6 +267,7 @@ export default function Promo() {
                   <img
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
+                    crossOrigin="anonymous"
                     className="hidden sm:block object-contain drop-shadow-lg shrink-0"
                     style={{ maxHeight: '14rem' }}
                   />
