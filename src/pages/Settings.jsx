@@ -192,13 +192,13 @@ export default function Settings() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Configuración</h1>
+    <div className="h-[calc(100vh-140px)] flex flex-col">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 shrink-0">Configuración</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Models section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-3 shrink-0">
             <div className="flex items-center gap-2">
               <SettingsIcon className="w-5 h-5 text-blue-500 dark:text-blue-400" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Modelos</h2>
@@ -257,7 +257,7 @@ export default function Settings() {
           )}
 
           {/* Models list */}
-          <div className="space-y-3">
+          <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
             {models.map(model => (
               <div key={model.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 {editingModel?.id === model.id ? (
@@ -328,8 +328,8 @@ export default function Settings() {
         </div>
 
         {/* Flavors section */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-3 shrink-0">
             <div className="flex items-center gap-2">
               <Package className="w-5 h-5 text-green-600 dark:text-green-400" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Sabores</h2>
@@ -347,7 +347,7 @@ export default function Settings() {
           <select
             value={selectedModelForFlavors || ''}
             onChange={(e) => setSelectedModelForFlavors(e.target.value)}
-            className="w-full mb-4 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full mb-3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white shrink-0"
           >
             {models.map(model => (
               <option key={model.id} value={model.id}>{model.name}</option>
@@ -392,7 +392,7 @@ export default function Settings() {
           )}
 
           {/* Flavors list */}
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
             {getModelFlavors(selectedModelForFlavors).map(flavor => (
               <div key={flavor.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 {editingFlavor?.id === flavor.id ? (
