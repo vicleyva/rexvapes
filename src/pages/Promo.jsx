@@ -361,7 +361,8 @@ export default function Promo() {
               <img
                 src={import.meta.env.BASE_URL + "logo.png"}
                 alt="Rex Vapes"
-                className="object-contain drop-shadow-lg shrink-0 w-40 h-40 sm:w-56 sm:h-56"
+                className="object-contain drop-shadow-lg shrink-0"
+                style={{ maxHeight: '18rem' }}
               />
               <div className="flex-1">
                 <h2 className="text-3xl sm:text-5xl font-bold text-white drop-shadow-lg">
