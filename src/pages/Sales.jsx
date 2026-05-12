@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import ModelSelector from '../components/ModelSelector'
 import SaleModal from '../components/SaleModal'
 import { ShoppingCart, Check, Search } from 'lucide-react'
+import Swal from 'sweetalert2'
 
 export default function Sales() {
   const { user } = useAuth()
@@ -58,9 +59,20 @@ export default function Sales() {
 
       if (saleError) throw saleError
 
-      // Update stock
-      const flavor = flavors.find(f => f.id === saleData.flavor_id)
-      const newStock = flavor.stock - saleData.quantity
+      // Fetch current stock and reservations to avoid race conditions
+      const [{ data: currentFlavor }, { data: activeReservations }] = await Promise.all([
+        supabase.from('flavors').select('stock').eq('id', saleData.flavor_id).single(),
+        supabase.from('reservations').select('quantity').eq('flavor_id', saleData.flavor_id).eq('status', 'active')
+      ])
+
+      const reserved = (activeReservations || []).reduce((sum, r) => sum + r.quantity, 0)
+      const available = currentFlavor.stock - reserved
+
+      if (available < saleData.quantity) {
+        throw new Error(`Stock insuficiente. Disponible: ${available}`)
+      }
+
+      const newStock = currentFlavor.stock - saleData.quantity
 
       const { error: updateError } = await supabase
         .from('flavors')
@@ -81,7 +93,13 @@ export default function Sales() {
       setTimeout(() => setSuccess(false), 3000)
     } catch (error) {
       console.error('Error recording sale:', error)
-      alert('Error al registrar venta')
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'No se pudo registrar la venta',
+        confirmButtonColor: '#3b82f6'
+      })
+      fetchData() // Refresh to get current stock
     }
   }
 
