@@ -1,8 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette, Download } from 'lucide-react'
-import html2canvas from 'html2canvas'
-import Swal from 'sweetalert2'
+import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette, Maximize2, X } from 'lucide-react'
 
 const GRADIENTS = [
   { id: 'sunset', name: 'Sunset', class: 'from-purple-600 via-pink-500 to-orange-400', style: 'linear-gradient(to bottom right, #9333ea, #ec4899, #fb923c)' },
@@ -24,8 +22,7 @@ export default function Promo() {
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState('visual') // 'visual' or 'text'
   const [selectedGradient, setSelectedGradient] = useState(GRADIENTS[0])
-  const [exporting, setExporting] = useState(false)
-  const promoCardRef = useRef(null)
+  const [fullscreen, setFullscreen] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -116,69 +113,6 @@ export default function Promo() {
     window.open(`https://wa.me/?text=${text}`, '_blank')
   }
 
-  const downloadPromoImage = async () => {
-    if (!promoCardRef.current) return
-    setExporting(true)
-    try {
-      const canvas = await html2canvas(promoCardRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#1f2937',
-        logging: false,
-        removeContainer: true,
-        onclone: (clonedDoc, element) => {
-          // Fix oklab/oklch color issue - replace with simple colors
-          const allElements = element.querySelectorAll('*')
-          allElements.forEach(el => {
-            const computed = window.getComputedStyle(el)
-            // Check for unsupported color functions
-            const hasUnsupportedColor = (str) => str && (str.includes('oklab') || str.includes('oklch'))
-            if (hasUnsupportedColor(computed.color)) {
-              el.style.color = '#ffffff'
-            }
-            if (hasUnsupportedColor(computed.backgroundColor)) {
-              el.style.backgroundColor = 'transparent'
-            }
-            if (hasUnsupportedColor(computed.borderColor)) {
-              el.style.borderColor = 'transparent'
-            }
-          })
-          // Fix images CORS
-          const images = element.querySelectorAll('img')
-          images.forEach(img => {
-            img.crossOrigin = 'anonymous'
-          })
-        }
-      })
-
-      // Convert to blob and download
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          console.error('Failed to create blob')
-          setExporting(false)
-          return
-        }
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `promo-${selectedModel?.name || 'rexvapes'}.png`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-        setExporting(false)
-      }, 'image/png')
-    } catch (err) {
-      console.error('Error exporting:', err)
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error al exportar imagen: ' + err.message
-      })
-      setExporting(false)
-    }
-  }
 
   if (loading) {
     return (
@@ -249,7 +183,7 @@ export default function Promo() {
         {activeTab === 'visual' ? (
           /* Visual Promo Card - Screenshot ready */
           <div className="space-y-4">
-            {/* Gradient selector + Download button */}
+            {/* Gradient selector + Fullscreen button */}
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2 flex-wrap">
                 <Palette className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -267,21 +201,20 @@ export default function Promo() {
                 ))}
               </div>
               <button
-                onClick={downloadPromoImage}
-                disabled={exporting}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+                onClick={() => setFullscreen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
               >
-                <Download className="w-4 h-4" />
-                {exporting ? 'Exportando...' : 'Descargar PNG'}
+                <Maximize2 className="w-4 h-4" />
+                Pantalla Completa
               </button>
             </div>
 
-            {/* Promo card */}
+            {/* Promo card preview */}
             <div className="flex justify-center px-2 sm:px-0">
               <div
-                ref={promoCardRef}
                 style={{ background: selectedGradient.style }}
-                className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl"
+                className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl cursor-pointer hover:scale-[1.01] transition-transform"
+                onClick={() => setFullscreen(true)}
               >
                 {/* Header: Logo left, Info right (no logo on mobile) */}
                 <div className="flex items-center gap-6 mb-4">
@@ -289,7 +222,6 @@ export default function Promo() {
                   <img
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
-                    crossOrigin="anonymous"
                     className="hidden sm:block object-contain drop-shadow-lg shrink-0"
                     style={{ maxHeight: '14rem' }}
                   />
@@ -329,6 +261,9 @@ export default function Promo() {
                 </div>
               </div>
             </div>
+            <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-2">
+              Toca la tarjeta o el botón para pantalla completa
+            </p>
           </div>
         ) : (
           /* Text Promo */
@@ -403,6 +338,71 @@ export default function Promo() {
           </div>
         )}
       </div>
+
+      {/* Fullscreen overlay */}
+      {fullscreen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: selectedGradient.style }}
+          onClick={() => setFullscreen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setFullscreen(false)}
+            className="absolute top-4 right-4 p-2 bg-black/30 hover:bg-black/50 rounded-full text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Fullscreen promo card */}
+          <div className="max-w-4xl w-full" onClick={e => e.stopPropagation()}>
+            {/* Header: Logo left, Info right */}
+            <div className="flex items-center gap-8 mb-6">
+              <img
+                src={import.meta.env.BASE_URL + "logo.png"}
+                alt="Rex Vapes"
+                className="object-contain drop-shadow-lg shrink-0 w-40 h-40 sm:w-56 sm:h-56"
+              />
+              <div className="flex-1">
+                <h2 className="text-3xl sm:text-5xl font-bold text-white drop-shadow-lg">
+                  {selectedModel?.name || 'Selecciona modelo'}
+                </h2>
+                {selectedModel?.puffs && (
+                  <p className="text-white/90 text-xl sm:text-2xl mt-2">💨 {selectedModel.puffs} puffs</p>
+                )}
+                <p className="text-4xl sm:text-6xl font-bold text-yellow-300 drop-shadow-lg mt-3">
+                  ${selectedModel?.price || '---'} MXN
+                </p>
+              </div>
+            </div>
+
+            {/* Flavors */}
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 sm:p-6">
+              <h3 className="text-white font-bold text-center mb-4 text-lg sm:text-xl">
+                ✅ Sabores disponibles ({availableFlavors.length})
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {availableFlavors.map(f => (
+                  <div key={f.id} className="text-white/90 text-sm sm:text-base py-1 px-2">
+                    • {f.name_es || f.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 text-center">
+              <p className="text-white/90 text-base sm:text-lg">📍 Monterrey, NL</p>
+              <p className="text-white font-bold text-xl sm:text-2xl mt-2">📲 ¡Escríbenos!</p>
+            </div>
+          </div>
+
+          {/* Hint */}
+          <p className="absolute bottom-4 left-0 right-0 text-center text-white/60 text-sm">
+            Toma screenshot y toca para cerrar
+          </p>
+        </div>
+      )}
     </div>
   )
 }
