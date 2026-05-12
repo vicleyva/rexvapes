@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard'
 import Inventory from './pages/Inventory'
 import Sales from './pages/Sales'
 import History from './pages/History'
-import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Reservations from './pages/Reservations'
 import Clients from './pages/Clients'
@@ -59,11 +58,6 @@ function App() {
       <Route path="/history" element={
         <ProtectedRoute>
           <Layout><History /></Layout>
-        </ProtectedRoute>
-      } />
-      <Route path="/reports" element={
-        <ProtectedRoute>
-          <Layout><Reports /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/reservations" element={

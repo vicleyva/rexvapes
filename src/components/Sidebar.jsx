@@ -5,7 +5,6 @@ import {
   Package,
   ShoppingCart,
   History,
-  BarChart3,
   Settings,
   LogOut,
   Menu,
@@ -19,7 +18,7 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = 'v1.4.7'
+const APP_VERSION = 'v1.4.8'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -28,7 +27,6 @@ const navItems = [
   { path: '/reservations', label: 'Reservaciones', icon: CalendarClock },
   { path: '/history', label: 'Historial', icon: History },
   { path: '/clients', label: 'Clientes', icon: Users },
-  { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/promo', label: 'Promo', icon: MessageCircle },
   { path: '/settings', label: 'Configuración', icon: Settings },
 ]
