@@ -9,10 +9,10 @@ export default function RestockModal({ isOpen, onClose, flavor, model, onConfirm
   useEffect(() => {
     if (isOpen) {
       setQuantity(1)
-      setCost('')
+      setCost(model?.cost ? model.cost.toString() : '')
       setNotes('')
     }
-  }, [isOpen])
+  }, [isOpen, model])
 
   if (!isOpen || !flavor || !model) return null
 
