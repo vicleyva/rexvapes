@@ -223,7 +223,7 @@ export default function Promo() {
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
                     className="hidden sm:block object-contain drop-shadow-lg shrink-0"
-                    style={{ maxHeight: '14rem' }}
+                    style={{ maxHeight: '16rem' }}
                   />
 
                   {/* Model info */}
@@ -254,11 +254,6 @@ export default function Promo() {
                   </div>
                 </div>
 
-                {/* Footer */}
-                <div className="mt-4 text-center">
-                  <p className="text-white/90 text-sm">📍 Monterrey, NL</p>
-                  <p className="text-white font-bold text-lg mt-1">📲 ¡Escríbenos!</p>
-                </div>
               </div>
             </div>
             <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-2">
@@ -357,12 +352,12 @@ export default function Promo() {
           {/* Fullscreen promo card */}
           <div className="max-w-4xl w-full" onClick={e => e.stopPropagation()}>
             {/* Header: Logo left, Info right */}
-            <div className="flex items-center gap-8 mb-6">
+            <div className="flex items-center gap-8">
               <img
                 src={import.meta.env.BASE_URL + "logo.png"}
                 alt="Rex Vapes"
                 className="object-contain drop-shadow-lg shrink-0"
-                style={{ maxHeight: '18rem' }}
+                style={{ maxHeight: '24rem' }}
               />
               <div className="flex-1">
                 <h2 className="text-3xl sm:text-5xl font-bold text-white drop-shadow-lg">
@@ -391,11 +386,6 @@ export default function Promo() {
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="mt-6 text-center">
-              <p className="text-white/90 text-base sm:text-lg">📍 Monterrey, NL</p>
-              <p className="text-white font-bold text-xl sm:text-2xl mt-2">📲 ¡Escríbenos!</p>
-            </div>
           </div>
 
           {/* Hint */}
