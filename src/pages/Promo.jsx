@@ -232,42 +232,42 @@ export default function Promo() {
             </div>
 
             {/* Promo card */}
-            <div className="flex justify-center">
+            <div className="flex justify-center px-2 sm:px-0">
               <div
                 ref={promoCardRef}
-                className={`bg-gradient-to-br ${selectedGradient.class} rounded-3xl p-6 max-w-3xl w-full shadow-2xl`}
+                className={`bg-gradient-to-br ${selectedGradient.class} rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl`}
               >
-                {/* Header: Logo left, Info right */}
-                <div className="flex items-center gap-6 mb-4">
-                  {/* Logo - BIG */}
+                {/* Header: Logo left, Info right (stacks on mobile) */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-4">
+                  {/* Logo - BIG on desktop, medium on mobile */}
                   <img
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
-                    className="w-44 h-44 object-contain drop-shadow-lg shrink-0"
+                    className="w-28 h-28 sm:w-44 sm:h-44 object-contain drop-shadow-lg shrink-0"
                   />
 
                   {/* Model info */}
-                  <div className="flex-1">
-                    <h2 className="text-4xl font-bold text-white drop-shadow-lg">
+                  <div className="flex-1 text-center sm:text-left">
+                    <h2 className="text-2xl sm:text-4xl font-bold text-white drop-shadow-lg">
                       {selectedModel?.name || 'Selecciona modelo'}
                     </h2>
                     {selectedModel?.puffs && (
-                      <p className="text-white/90 text-xl mt-1">💨 {selectedModel.puffs} puffs</p>
+                      <p className="text-white/90 text-lg sm:text-xl mt-1">💨 {selectedModel.puffs} puffs</p>
                     )}
-                    <p className="text-5xl font-bold text-yellow-300 drop-shadow-lg mt-2">
+                    <p className="text-3xl sm:text-5xl font-bold text-yellow-300 drop-shadow-lg mt-2">
                       ${selectedModel?.price || '---'} MXN
                     </p>
                   </div>
                 </div>
 
                 {/* Flavors */}
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-                  <h3 className="text-white font-bold text-center mb-3">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-3 sm:p-4">
+                  <h3 className="text-white font-bold text-center mb-2 sm:mb-3 text-sm sm:text-base">
                     ✅ Sabores disponibles ({availableFlavors.length})
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1">
                     {availableFlavors.map(f => (
-                      <div key={f.id} className="text-white/90 text-sm py-1 px-2">
+                      <div key={f.id} className="text-white/90 text-xs sm:text-sm py-1 px-1 sm:px-2">
                         • {f.name_es || f.name}
                       </div>
                     ))}
