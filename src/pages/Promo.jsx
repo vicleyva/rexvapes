@@ -110,8 +110,8 @@ export default function Promo() {
   const availableFlavors = getAvailableFlavors()
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="h-[calc(100vh-140px)] flex flex-col">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Promoción WhatsApp</h1>
         <button
           onClick={fetchData}
@@ -122,11 +122,11 @@ export default function Promo() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Left: Model selector and flavors preview */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4 min-h-0">
           {/* Model selector */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shrink-0">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Selecciona modelo
             </label>
@@ -149,8 +149,8 @@ export default function Promo() {
           </div>
 
           {/* Flavors preview */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col flex-1 min-h-0">
+            <div className="flex items-center justify-between mb-3 shrink-0">
               <h3 className="font-semibold text-gray-900 dark:text-white">
                 Sabores disponibles
               </h3>
@@ -158,7 +158,7 @@ export default function Promo() {
                 {availableFlavors.length}
               </span>
             </div>
-            <div className="max-h-64 overflow-y-auto space-y-1">
+            <div className="flex-1 overflow-y-auto space-y-1 min-h-0">
               {availableFlavors.map(f => (
                 <div key={f.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700">
                   <div className="flex-1 min-w-0">
@@ -180,18 +180,18 @@ export default function Promo() {
         </div>
 
         {/* Right: Generated text preview */}
-        <div className="space-y-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+        <div className="flex flex-col gap-4 min-h-0">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col flex-1 min-h-0">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 shrink-0">
               Vista previa del mensaje
             </h3>
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap text-gray-800 dark:text-gray-200 max-h-80 overflow-y-auto">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap text-gray-800 dark:text-gray-200 flex-1 overflow-y-auto min-h-0">
               {generatePromoText()}
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 shrink-0">
             <button
               onClick={copyToClipboard}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all ${
