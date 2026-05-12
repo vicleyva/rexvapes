@@ -351,22 +351,22 @@ export default function Promo() {
 
           {/* Fullscreen promo card */}
           <div className="max-w-4xl w-full" onClick={e => e.stopPropagation()}>
-            {/* Header: Logo left, Info right */}
-            <div className="flex items-center gap-8">
+            {/* Header: Stacked on mobile, side-by-side on desktop */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
               <img
                 src={import.meta.env.BASE_URL + "logo.png"}
                 alt="Rex Vapes"
                 className="object-contain drop-shadow-lg shrink-0"
-                style={{ maxHeight: '24rem' }}
+                style={{ maxHeight: '10rem' }}
               />
-              <div className="flex-1">
-                <h2 className="text-3xl sm:text-5xl font-bold text-white drop-shadow-lg">
+              <div className="flex-1 text-center sm:text-left">
+                <h2 className="text-2xl sm:text-5xl font-bold text-white drop-shadow-lg">
                   {selectedModel?.name || 'Selecciona modelo'}
                 </h2>
                 {selectedModel?.puffs && (
-                  <p className="text-white/90 text-xl sm:text-2xl mt-2">💨 {selectedModel.puffs} puffs</p>
+                  <p className="text-white/90 text-lg sm:text-2xl mt-1 sm:mt-2">💨 {selectedModel.puffs} puffs</p>
                 )}
-                <p className="text-4xl sm:text-6xl font-bold text-yellow-300 drop-shadow-lg mt-3">
+                <p className="text-3xl sm:text-6xl font-bold text-yellow-300 drop-shadow-lg mt-2 sm:mt-3">
                   ${selectedModel?.price || '---'} MXN
                 </p>
               </div>
