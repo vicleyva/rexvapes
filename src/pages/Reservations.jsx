@@ -617,7 +617,7 @@ export default function Reservations() {
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Producto</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Entregado</th>
+                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Margen</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Pagado</th>
                     </tr>
                   </thead>
@@ -639,8 +639,17 @@ export default function Reservations() {
                         <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                           ${r.quantity * (r.price ?? r.flavors?.models?.price ?? 0)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                          {formatDateTime(r.delivered_at)}
+                        <td className="px-4 py-3 text-right text-sm font-semibold">
+                          {(() => {
+                            const total = r.quantity * (r.price ?? r.flavors?.models?.price ?? 0)
+                            const cost = r.quantity * (r.flavors?.models?.cost ?? 0)
+                            const margin = total - cost
+                            return (
+                              <span className={margin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                                {margin >= 0 ? '+' : ''}{margin}
+                              </span>
+                            )
+                          })()}
                         </td>
                         <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400 font-medium">
                           {formatDateTime(r.paid_at)}
