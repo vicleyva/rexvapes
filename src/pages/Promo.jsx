@@ -24,6 +24,17 @@ export default function Promo() {
   const [selectedGradient, setSelectedGradient] = useState(GRADIENTS[0])
   const [fullscreen, setFullscreen] = useState(false)
 
+  // Escape key to close fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && fullscreen) {
+        setFullscreen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [fullscreen])
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -350,8 +361,7 @@ export default function Promo() {
               <img
                 src={import.meta.env.BASE_URL + "logo.png"}
                 alt="Rex Vapes"
-                className="object-contain drop-shadow-lg shrink-0"
-                style={{ maxHeight: '10rem' }}
+                className="object-contain drop-shadow-lg shrink-0 h-32 sm:h-80"
               />
               <div className="flex-1 text-center sm:text-left">
                 <h2 className="text-2xl sm:text-5xl font-bold text-white drop-shadow-lg">
