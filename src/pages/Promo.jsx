@@ -128,15 +128,20 @@ export default function Promo() {
         logging: false,
         removeContainer: true,
         onclone: (clonedDoc, element) => {
-          // Fix oklab color issue - replace with simple colors
+          // Fix oklab/oklch color issue - replace with simple colors
           const allElements = element.querySelectorAll('*')
           allElements.forEach(el => {
             const computed = window.getComputedStyle(el)
-            if (computed.color.includes('oklab')) {
+            // Check for unsupported color functions
+            const hasUnsupportedColor = (str) => str && (str.includes('oklab') || str.includes('oklch'))
+            if (hasUnsupportedColor(computed.color)) {
               el.style.color = '#ffffff'
             }
-            if (computed.backgroundColor.includes('oklab')) {
+            if (hasUnsupportedColor(computed.backgroundColor)) {
               el.style.backgroundColor = 'transparent'
+            }
+            if (hasUnsupportedColor(computed.borderColor)) {
+              el.style.borderColor = 'transparent'
             }
           })
           // Fix images CORS
