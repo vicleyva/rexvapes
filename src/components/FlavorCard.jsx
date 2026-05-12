@@ -23,21 +23,20 @@ export default function FlavorCard({ flavor, onAdjust, showControls = true, rese
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{flavor.name_es}</p>
           )}
         </div>
-        <div className="flex flex-col items-end ml-2">
-          <span className={`${getStockBadge(available)} text-white text-sm font-bold px-2 py-1 rounded-full`}>
-            {available}
-          </span>
+        <span className={`${getStockBadge(available)} text-white text-sm font-bold px-2 py-1 rounded-full ml-2`}>
+          {available}
+        </span>
+      </div>
+
+      {showControls && (
+        <>
           {reserved > 0 && (
-            <div className="text-xs mt-1 text-right">
+            <div className="text-xs text-center mt-2">
               <span className="text-gray-500 dark:text-gray-400">Stock: {flavor.stock}</span>
               <span className="text-orange-600 dark:text-orange-400 ml-1">| Res: {reserved}</span>
             </div>
           )}
-        </div>
-      </div>
-
-      {showControls && (
-        <div className="flex items-center justify-center gap-2 mt-3">
+          <div className="flex items-center justify-center gap-2 mt-2">
           <button
             onClick={() => onAdjust(flavor.id, -1)}
             disabled={available === 0}
@@ -52,7 +51,8 @@ export default function FlavorCard({ flavor, onAdjust, showControls = true, rese
           >
             <Plus className="w-4 h-4" />
           </button>
-        </div>
+          </div>
+        </>
       )}
     </div>
   )
