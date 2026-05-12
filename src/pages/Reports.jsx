@@ -38,13 +38,17 @@ export default function Reports() {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
       const [{ data: salesData }, { data: restocksData }] = await Promise.all([
-        supabase.from('sales').select('*').gte('sold_at', thirtyDaysAgo.toISOString()),
+        supabase.from('sales').select('*, flavors(model_id, models(cost))').gte('sold_at', thirtyDaysAgo.toISOString()),
         supabase.from('restocks').select('*').gte('created_at', thirtyDaysAgo.toISOString())
       ])
 
       // Calculate financials (30 days)
       const totalRevenue = salesData?.reduce((sum, s) => sum + parseFloat(s.total || 0), 0) || 0
-      const totalCosts = restocksData?.reduce((sum, r) => sum + parseFloat(r.cost || 0), 0) || 0
+      // Calculate costs based on model cost per unit sold
+      const totalCosts = salesData?.reduce((sum, s) => {
+        const modelCost = s.flavors?.models?.cost || 0
+        return sum + (s.quantity * modelCost)
+      }, 0) || 0
       const unitsSold = salesData?.reduce((sum, s) => sum + (s.quantity || 0), 0) || 0
       const unitsRestocked = restocksData?.reduce((sum, r) => sum + (r.quantity || 0), 0) || 0
       setFinancials({
@@ -147,10 +151,10 @@ export default function Reports() {
             <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
               <ShoppingCart className="w-4 h-4 text-red-600 dark:text-red-400" />
             </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Compras</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">Costo</span>
           </div>
           <p className="text-xl font-bold text-gray-900 dark:text-white">${financials.costs.toFixed(0)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{financials.unitsRestocked} unidades</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">de {financials.unitsSold} vendidas</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-2 mb-2">
