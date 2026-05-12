@@ -161,7 +161,7 @@ export default function Availability() {
             {/* Flavors display */}
             {modelFlavors.length > 0 ? (
               viewMode === 'cards' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-fr">
                   {modelFlavors.map(flavor => (
                     <AvailabilityCard key={flavor.id} flavor={flavor} />
                   ))}

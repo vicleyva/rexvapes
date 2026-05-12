@@ -197,7 +197,7 @@ export default function Sales() {
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Selecciona el sabor para registrar la venta:
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 auto-rows-fr">
             {getModelFlavors().map(flavor => {
               const available = getAvailableStock(flavor)
               const reserved = getReservedQty(flavor.id)
@@ -205,27 +205,25 @@ export default function Sales() {
                 <div
                   key={flavor.id}
                   onClick={() => available > 0 && setSaleModal({ isOpen: true, flavor: { ...flavor, stock: available } })}
-                  className={`rounded-xl border-2 p-4 transition-all ${getStockStyle(available)}`}
+                  className={`rounded-xl border-2 p-3 transition-all h-full flex flex-col ${getStockStyle(available)}`}
                 >
-                  <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 truncate">{flavor.name}</h3>
+                      <h3 className="font-semibold text-gray-900 truncate text-sm">{flavor.name}</h3>
                       {flavor.name_es && (
-                        <p className="text-sm text-gray-500 truncate">{flavor.name_es}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <div>
-                      <span className={`text-sm ${available === 0 ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Stock: {available}
-                      </span>
-                      {reserved > 0 && (
-                        <span className="text-xs text-orange-500 ml-1">({reserved} res.)</span>
+                        <p className="text-xs text-gray-500 truncate">{flavor.name_es}</p>
                       )}
                     </div>
                     {available > 0 && (
-                      <ShoppingCart className="w-5 h-5 text-cyan-500" />
+                      <ShoppingCart className="w-4 h-4 text-cyan-500 shrink-0" />
+                    )}
+                  </div>
+                  <div className="mt-auto pt-2 text-center">
+                    <span className={`text-xs font-medium ${available === 0 ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Stock: {available}
+                    </span>
+                    {reserved > 0 && (
+                      <span className="text-xs text-orange-500 ml-1">| Res: {reserved}</span>
                     )}
                   </div>
                 </div>
