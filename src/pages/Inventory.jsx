@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import FlavorCard from '../components/FlavorCard'
 import ModelSelector from '../components/ModelSelector'
 import RestockModal from '../components/RestockModal'
+import ReservationInfoModal from '../components/ReservationInfoModal'
 import { Package, Search, Plus, Filter } from 'lucide-react'
 
 export default function Inventory() {
@@ -14,6 +15,7 @@ export default function Inventory() {
   const [stockFilter, setStockFilter] = useState('all') // 'all', 'stocked', 'empty'
   const [loading, setLoading] = useState(true)
   const [restockModal, setRestockModal] = useState({ isOpen: false, flavor: null })
+  const [reservationModal, setReservationModal] = useState({ isOpen: false, flavor: null, reservations: [] })
 
   useEffect(() => {
     fetchData()
@@ -24,7 +26,10 @@ export default function Inventory() {
       const [{ data: modelsData }, { data: flavorsData }, { data: reservationsData }] = await Promise.all([
         supabase.from('models').select('*').eq('is_active', true).order('name'),
         supabase.from('flavors').select('*').eq('is_active', true).order('name'),
-        supabase.from('reservations').select('flavor_id, quantity').eq('status', 'active')
+        supabase
+          .from('reservations')
+          .select('id, flavor_id, quantity, delivery_date, notes, customer_name, clients(id, name, phone)')
+          .eq('status', 'active')
       ])
 
       setModels(modelsData || [])
@@ -104,6 +109,18 @@ export default function Inventory() {
     return reservations
       .filter(r => r.flavor_id === flavorId)
       .reduce((sum, r) => sum + r.quantity, 0)
+  }
+
+  const getReservationDetails = (flavorId) => {
+    return reservations.filter(r => r.flavor_id === flavorId)
+  }
+
+  const handleShowReservations = (flavor, reservationDetails) => {
+    setReservationModal({
+      isOpen: true,
+      flavor,
+      reservations: reservationDetails
+    })
   }
 
   const filteredFlavors = flavors.filter(f => {
@@ -196,6 +213,8 @@ export default function Inventory() {
                 flavor={flavor}
                 onAdjust={handleAdjust}
                 reserved={getReservedQty(flavor.id)}
+                reservationDetails={getReservationDetails(flavor.id)}
+                onShowReservations={handleShowReservations}
               />
               <button
                 onClick={() => setRestockModal({ isOpen: true, flavor })}
@@ -220,6 +239,13 @@ export default function Inventory() {
         flavor={restockModal.flavor}
         model={selectedModel}
         onConfirm={handleRestock}
+      />
+
+      <ReservationInfoModal
+        isOpen={reservationModal.isOpen}
+        onClose={() => setReservationModal({ isOpen: false, flavor: null, reservations: [] })}
+        reservations={reservationModal.reservations}
+        flavorName={reservationModal.flavor?.name || ''}
       />
     </div>
   )
