@@ -72,14 +72,14 @@ export default function Reports() {
         for (let i = 0; i < 7; i++) {
           const date = new Date()
           date.setDate(date.getDate() - i)
-          const key = date.toISOString().split('T')[0]
+          const key = date.toLocaleDateString('en-CA') // YYYY-MM-DD local timezone
           dailySales[key] = { date: key, quantity: 0, revenue: 0 }
         }
 
         salesData
           .filter(sale => new Date(sale.sold_at) >= last7Days)
           .forEach(sale => {
-            const key = new Date(sale.sold_at).toISOString().split('T')[0]
+            const key = new Date(sale.sold_at).toLocaleDateString('en-CA') // Local timezone
             if (dailySales[key]) {
               dailySales[key].quantity += sale.quantity
               dailySales[key].revenue += parseFloat(sale.total)
