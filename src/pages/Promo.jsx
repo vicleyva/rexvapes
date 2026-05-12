@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette, Download } from 'lucide-react'
 import html2canvas from 'html2canvas'
+import Swal from 'sweetalert2'
 
 const GRADIENTS = [
   { id: 'sunset', name: 'Sunset', class: 'from-purple-600 via-pink-500 to-orange-400', style: 'linear-gradient(to bottom right, #9333ea, #ec4899, #fb923c)' },
@@ -153,7 +154,11 @@ export default function Promo() {
       }, 'image/png')
     } catch (err) {
       console.error('Error exporting:', err)
-      alert('Error al exportar imagen: ' + err.message)
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al exportar imagen: ' + err.message
+      })
       setExporting(false)
     }
   }
