@@ -327,7 +327,7 @@ export default function Settings() {
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">{model.name}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {model.puffs && `${model.puffs} puffs • `}${getModelFlavors(model.id).length} sabores
+                        {model.puffs ? `${model.puffs} puffs • ` : ''}{getModelFlavors(model.id).length} sabores
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
