@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = 'v1.3.4'
+const APP_VERSION = 'v1.3.5'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },

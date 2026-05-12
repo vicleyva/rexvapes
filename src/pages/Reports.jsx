@@ -28,8 +28,8 @@ export default function Reports() {
       flavorsData?.forEach(f => { flavorsMap[f.id] = f })
       setFlavors(flavorsMap)
 
-      // Low stock items
-      const lowStock = flavorsData?.filter(f => f.is_active && f.stock > 0 && f.stock <= (f.min_stock || 2)) || []
+      // Low stock items (including out of stock)
+      const lowStock = flavorsData?.filter(f => f.is_active && f.stock <= (f.min_stock || 2)) || []
       setLowStockItems(lowStock)
 
       // Get sales for the last 30 days
@@ -192,11 +192,22 @@ export default function Reports() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {lowStockItems.map(item => {
                 const model = models[item.model_id]
+                const isOutOfStock = item.stock === 0
                 return (
-                  <div key={item.id} className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-3">
+                  <div key={item.id} className={`rounded-lg p-3 border ${
+                    isOutOfStock
+                      ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700'
+                      : 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700'
+                  }`}>
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{model?.name || ''}</p>
-                    <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400 mt-1">{item.stock}</p>
+                    <p className={`text-lg font-bold mt-1 ${
+                      isOutOfStock
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-yellow-600 dark:text-yellow-400'
+                    }`}>
+                      {isOutOfStock ? 'Agotado' : item.stock}
+                    </p>
                   </div>
                 )
               })}
