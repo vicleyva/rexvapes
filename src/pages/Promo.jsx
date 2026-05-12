@@ -4,14 +4,14 @@ import { MessageCircle, Copy, Check, RefreshCw, Image, FileText, Palette, Downlo
 import html2canvas from 'html2canvas'
 
 const GRADIENTS = [
-  { id: 'sunset', name: 'Sunset', class: 'from-purple-600 via-pink-500 to-orange-400' },
-  { id: 'ocean', name: 'Ocean', class: 'from-cyan-500 via-blue-500 to-purple-600' },
-  { id: 'fire', name: 'Fire', class: 'from-yellow-400 via-orange-500 to-red-600' },
-  { id: 'forest', name: 'Forest', class: 'from-green-400 via-emerald-500 to-teal-600' },
-  { id: 'candy', name: 'Candy', class: 'from-pink-400 via-purple-500 to-indigo-600' },
-  { id: 'midnight', name: 'Midnight', class: 'from-slate-900 via-purple-900 to-slate-900' },
-  { id: 'lime', name: 'Lime', class: 'from-lime-400 via-green-500 to-emerald-600' },
-  { id: 'berry', name: 'Berry', class: 'from-rose-500 via-fuchsia-500 to-violet-600' },
+  { id: 'sunset', name: 'Sunset', class: 'from-purple-600 via-pink-500 to-orange-400', style: 'linear-gradient(to bottom right, #9333ea, #ec4899, #fb923c)' },
+  { id: 'ocean', name: 'Ocean', class: 'from-cyan-500 via-blue-500 to-purple-600', style: 'linear-gradient(to bottom right, #06b6d4, #3b82f6, #9333ea)' },
+  { id: 'fire', name: 'Fire', class: 'from-yellow-400 via-orange-500 to-red-600', style: 'linear-gradient(to bottom right, #facc15, #f97316, #dc2626)' },
+  { id: 'forest', name: 'Forest', class: 'from-green-400 via-emerald-500 to-teal-600', style: 'linear-gradient(to bottom right, #4ade80, #10b981, #0d9488)' },
+  { id: 'candy', name: 'Candy', class: 'from-pink-400 via-purple-500 to-indigo-600', style: 'linear-gradient(to bottom right, #f472b6, #a855f7, #4f46e5)' },
+  { id: 'midnight', name: 'Midnight', class: 'from-slate-900 via-purple-900 to-slate-900', style: 'linear-gradient(to bottom right, #0f172a, #581c87, #0f172a)' },
+  { id: 'lime', name: 'Lime', class: 'from-lime-400 via-green-500 to-emerald-600', style: 'linear-gradient(to bottom right, #a3e635, #22c55e, #059669)' },
+  { id: 'berry', name: 'Berry', class: 'from-rose-500 via-fuchsia-500 to-violet-600', style: 'linear-gradient(to bottom right, #f43f5e, #d946ef, #7c3aed)' },
 ]
 
 export default function Promo() {
@@ -122,14 +122,29 @@ export default function Promo() {
       const canvas = await html2canvas(promoCardRef.current, {
         scale: 2,
         useCORS: true,
-        backgroundColor: null
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false
       })
-      const link = document.createElement('a')
-      link.download = `promo-${selectedModel?.name || 'rexvapes'}.png`
-      link.href = canvas.toDataURL('image/png')
-      link.click()
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error('Failed to create blob')
+          return
+        }
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `promo-${selectedModel?.name || 'rexvapes'}.png`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      }, 'image/png')
     } catch (err) {
       console.error('Error exporting:', err)
+      alert('Error al exportar imagen')
     } finally {
       setExporting(false)
     }
@@ -235,7 +250,8 @@ export default function Promo() {
             <div className="flex justify-center px-2 sm:px-0">
               <div
                 ref={promoCardRef}
-                className={`bg-gradient-to-br ${selectedGradient.class} rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl`}
+                style={{ background: selectedGradient.style }}
+                className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl"
               >
                 {/* Header: Logo left, Info right (no logo on mobile) */}
                 <div className="flex items-center gap-6 mb-4">
