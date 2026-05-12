@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="./logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Rexvapes</title>
     <!-- GitHub Pages SPA redirect handler -->
     <script>
@@ -18,10 +21,24 @@
         }
       }(window.location))
     </script>
-    <script type="module" crossorigin src="/rexvapes/assets/index-C_0KEf5v.js"></script>
-    <link rel="stylesheet" crossorigin href="/rexvapes/assets/index-bj2jZFJD.css">
+    <!-- Force reload if assets fail to load (cache busting) -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK') {
+          if (!sessionStorage.getItem('reloaded')) {
+            sessionStorage.setItem('reloaded', 'true');
+            location.reload(true);
+          }
+        }
+      }, true);
+      window.addEventListener('load', function() {
+        sessionStorage.removeItem('reloaded');
+      });
+    </script>
+    <script type="module" crossorigin src="/rexvapes/assets/index-BKXv_pbm.js"></script>
+    <link rel="stylesheet" crossorigin href="/rexvapes/assets/index-8Rh4sMs3.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>
