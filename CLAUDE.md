@@ -126,9 +126,10 @@ USING (status = 'active');
 | `/dashboard` | Dashboard | Yes |
 | `/inventory` | Inventory | Yes |
 | `/sales` | Sales | Yes |
-| `/history` | History | Yes |
-| `/reports` | Reports | Yes |
 | `/reservations` | Reservations | Yes |
+| `/history` | History | Yes |
+| `/clients` | Clients | Yes |
+| `/promo` | Promo | Yes |
 | `/settings` | Settings | Yes |
 
 ---
@@ -283,7 +284,7 @@ if (l.search[1] === '/' ) {
 2. **Low Stock Alerts** - Dashboard shows items at/below `min_stock`
 3. **Sales Recording** - Select flavor, quantity, auto-calculate total
 4. **Restock Tracking** - Record incoming inventory
-5. **Reports** - Sales analytics and trends
+5. **Dashboard Analytics** - Date-filtered financials, charts, top sellers (merged Reports)
 6. **Internal Use** - Record $0 sales for internal use (orange toggle)
 7. **Custom Price/Discount** - Apply discounts with savings display (green toggle)
 8. **Collapsible Sidebar** - Toggle between full (256px) and icon-only (80px) modes
@@ -298,6 +299,66 @@ if (l.search[1] === '/' ) {
 17. **Margin Column** - History and Reservations show profit/loss per transaction (green/red)
 18. **Promo Fullscreen** - Escape key exits, responsive mobile layout
 19. **Client Tracking** - Unified clients table for sales and reservations with search/create
+20. **Clients Page** - Full CRUD for managing customers (/clients)
+
+---
+
+## Development Learnings
+
+### JSX Template Literal Gotcha
+
+**Problem**: `$` before `{expression}` in JSX is literal text, not interpolation.
+
+```jsx
+// BAD - renders "$20 sabores" (literal $)
+{model.puffs && `${model.puffs} puffs • `}${count} sabores
+
+// GOOD - no stray $
+{model.puffs ? `${model.puffs} puffs • ` : ''}{count} sabores
+```
+
+### React State Race Conditions
+
+**Problem**: Multiple `useEffect` hooks fetching data that depends on each other.
+
+```jsx
+// BAD - fetchSalesData runs before flavors is populated
+useEffect(() => { fetchInventoryData() }, [])  // sets flavors
+useEffect(() => { fetchSalesData() }, [dateFrom, dateTo])  // uses flavors
+
+// GOOD - use a flag to sequence dependent fetches
+const [inventoryLoaded, setInventoryLoaded] = useState(false)
+
+useEffect(() => { fetchInventoryData() }, [])
+useEffect(() => {
+  if (inventoryLoaded) fetchSalesData()
+}, [dateFrom, dateTo, inventoryLoaded])
+
+// In fetchInventoryData:
+setFlavors(flavorsMap)
+setInventoryLoaded(true)  // AFTER setting state
+```
+
+### Database Schema Changes
+
+When adding new columns that replace old ones:
+
+```sql
+-- Add new column
+ALTER TABLE reservations ADD COLUMN client_id UUID REFERENCES clients(id);
+
+-- Make old column nullable (don't delete - existing data uses it)
+ALTER TABLE reservations ALTER COLUMN customer_name DROP NOT NULL;
+```
+
+**Code must handle both**: `reservation.clients?.name || reservation.customer_name`
+
+### Dashboard vs Reports Consolidation
+
+Avoid redundant pages with similar data. Better to have one page with filters:
+- Date range filters (Hoy, 7 días, 30 días, custom)
+- All metrics in one place
+- Charts adapt to selected period
 
 ---
 
