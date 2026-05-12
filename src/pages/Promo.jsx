@@ -259,7 +259,8 @@ export default function Promo() {
                   <img
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
-                    className="hidden sm:block w-44 h-44 object-contain drop-shadow-lg shrink-0"
+                    className="hidden sm:block object-contain drop-shadow-lg shrink-0"
+                    style={{ maxHeight: '14rem' }}
                   />
 
                   {/* Model info */}
