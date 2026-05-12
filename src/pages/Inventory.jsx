@@ -199,7 +199,7 @@ export default function Inventory() {
               />
               <button
                 onClick={() => setRestockModal({ isOpen: true, flavor })}
-                className="absolute top-2 right-2 p-2 bg-green-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-green-600"
+                className="absolute bottom-2 right-2 p-2 bg-green-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-green-600"
                 title="Agregar stock"
               >
                 <Plus className="w-4 h-4" />
