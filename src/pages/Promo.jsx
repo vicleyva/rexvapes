@@ -202,28 +202,29 @@ export default function Promo() {
             <div className="flex justify-center">
               <div
                 id="promo-card"
-                className={`bg-gradient-to-br ${selectedGradient.class} rounded-3xl p-6 max-w-2xl w-full shadow-2xl`}
+                className={`bg-gradient-to-br ${selectedGradient.class} rounded-3xl p-6 max-w-3xl w-full shadow-2xl`}
               >
-                {/* Logo */}
-                <div className="flex justify-center mb-4">
+                {/* Header: Logo left, Info right */}
+                <div className="flex items-center gap-6 mb-4">
+                  {/* Logo - BIG */}
                   <img
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
-                    className="w-28 h-28 object-contain drop-shadow-lg"
+                    className="w-44 h-44 object-contain drop-shadow-lg shrink-0"
                   />
-                </div>
 
-                {/* Model info */}
-                <div className="text-center mb-4">
-                  <h2 className="text-3xl font-bold text-white drop-shadow-lg">
-                    {selectedModel?.name || 'Selecciona modelo'}
-                  </h2>
-                  {selectedModel?.puffs && (
-                    <p className="text-white/90 text-lg">💨 {selectedModel.puffs} puffs</p>
-                  )}
-                  <p className="text-4xl font-bold text-yellow-300 drop-shadow-lg mt-2">
-                    ${selectedModel?.price || '---'} MXN
-                  </p>
+                  {/* Model info */}
+                  <div className="flex-1">
+                    <h2 className="text-4xl font-bold text-white drop-shadow-lg">
+                      {selectedModel?.name || 'Selecciona modelo'}
+                    </h2>
+                    {selectedModel?.puffs && (
+                      <p className="text-white/90 text-xl mt-1">💨 {selectedModel.puffs} puffs</p>
+                    )}
+                    <p className="text-5xl font-bold text-yellow-300 drop-shadow-lg mt-2">
+                      ${selectedModel?.price || '---'} MXN
+                    </p>
+                  </div>
                 </div>
 
                 {/* Flavors */}
