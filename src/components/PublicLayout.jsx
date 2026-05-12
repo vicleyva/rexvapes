@@ -25,9 +25,9 @@ export default function PublicLayout({ children }) {
     <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-purple-50 via-white to-pink-50'}`}>
       {/* Header */}
       <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center">
-            <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-28 h-28 object-contain" />
+            <img src={import.meta.env.BASE_URL + "logo.png"} alt="Rex Vapes" className="w-10 h-10 object-contain" />
           </div>
           <div className="flex items-center gap-3">
             <button
