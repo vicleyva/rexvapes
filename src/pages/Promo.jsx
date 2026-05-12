@@ -237,13 +237,13 @@ export default function Promo() {
                 ref={promoCardRef}
                 className={`bg-gradient-to-br ${selectedGradient.class} rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-3xl w-full shadow-2xl`}
               >
-                {/* Header: Logo left, Info right (stacks on mobile) */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-4">
-                  {/* Logo - BIG on desktop, medium on mobile */}
+                {/* Header: Logo left, Info right (no logo on mobile) */}
+                <div className="flex items-center gap-6 mb-4">
+                  {/* Logo - Hidden on mobile, visible on desktop */}
                   <img
                     src={import.meta.env.BASE_URL + "logo.png"}
                     alt="Rex Vapes"
-                    className="w-28 h-28 sm:w-44 sm:h-44 object-contain drop-shadow-lg shrink-0"
+                    className="hidden sm:block w-44 h-44 object-contain drop-shadow-lg shrink-0"
                   />
 
                   {/* Model info */}
