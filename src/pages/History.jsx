@@ -112,11 +112,23 @@ export default function History() {
     })
   }
 
+  // Helper functions to parse sale notes
+  const isInternalUse = (notes) => {
+    return notes?.includes('[USO INTERNO]') || false
+  }
+
+  const getDiscountAmount = (notes) => {
+    if (!notes) return null
+    const match = notes.match(/\[DESCUENTO -\$(\d+(?:\.\d+)?)\]/)
+    return match ? parseFloat(match[1]) : null
+  }
+
   const exportCSV = () => {
-    const headers = ['Fecha', 'Modelo', 'Sabor', 'Cantidad', 'Precio', 'Total', 'Notas']
+    const headers = ['Fecha', 'Modelo', 'Sabor', 'Cantidad', 'Precio', 'Total', 'Uso Interno', 'Descuento', 'Notas']
     const rows = filteredSales.map(sale => {
       const flavor = flavors[sale.flavor_id]
       const model = flavor ? models[flavor.model_id] : null
+      const discount = getDiscountAmount(sale.notes)
       return [
         formatDate(sale.sold_at),
         model?.name || '',
@@ -124,6 +136,8 @@ export default function History() {
         sale.quantity,
         sale.price,
         sale.total,
+        isInternalUse(sale.notes) ? 'Sí' : 'No',
+        discount ? `$${discount}` : '',
         sale.notes || ''
       ]
     })
@@ -390,6 +404,7 @@ export default function History() {
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Tipo</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Usuario</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cancelar</th>
                   </tr>
@@ -418,6 +433,23 @@ export default function History() {
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                           ${sale.total}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex flex-wrap gap-1 justify-center">
+                            {isInternalUse(sale.notes) && (
+                              <span className="bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-300 text-xs font-medium px-2 py-0.5 rounded">
+                                Interno
+                              </span>
+                            )}
+                            {getDiscountAmount(sale.notes) && (
+                              <span className="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-300 text-xs font-medium px-2 py-0.5 rounded">
+                                -${getDiscountAmount(sale.notes)}
+                              </span>
+                            )}
+                            {!isInternalUse(sale.notes) && !getDiscountAmount(sale.notes) && (
+                              <span className="text-gray-400 dark:text-gray-500 text-xs">-</span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                           {sale.sold_by?.split('@')[0] || '-'}
