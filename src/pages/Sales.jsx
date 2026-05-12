@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import ModelSelector from '../components/ModelSelector'
 import SaleModal from '../components/SaleModal'
-import { ShoppingCart, Check } from 'lucide-react'
+import { ShoppingCart, Check, Search } from 'lucide-react'
 
 export default function Sales() {
   const { user } = useAuth()
@@ -11,6 +11,7 @@ export default function Sales() {
   const [flavors, setFlavors] = useState([])
   const [reservations, setReservations] = useState([])
   const [selectedModel, setSelectedModel] = useState(null)
+  const [flavorSearch, setFlavorSearch] = useState('')
   const [saleModal, setSaleModal] = useState({ isOpen: false, flavor: null })
   const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState(false)
@@ -96,7 +97,15 @@ export default function Sales() {
 
   const getModelFlavors = () => {
     if (!selectedModel) return []
-    return flavors.filter(f => f.model_id === selectedModel.id)
+    return flavors.filter(f => {
+      const matchesModel = f.model_id === selectedModel.id
+      const available = getAvailableStock(f)
+      const hasStock = available > 0
+      const matchesSearch = !flavorSearch ||
+        f.name.toLowerCase().includes(flavorSearch.toLowerCase()) ||
+        (f.name_es && f.name_es.toLowerCase().includes(flavorSearch.toLowerCase()))
+      return matchesModel && hasStock && matchesSearch
+    })
   }
 
   const getStockStyle = (available) => {
@@ -133,16 +142,35 @@ export default function Sales() {
         </div>
       )}
 
-      {/* Model selector */}
+      {/* Model selector and flavor search */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Selecciona el modelo
-        </label>
-        <ModelSelector
-          models={models}
-          selectedModel={selectedModel}
-          onSelect={setSelectedModel}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Modelo
+            </label>
+            <ModelSelector
+              models={models}
+              selectedModel={selectedModel}
+              onSelect={(model) => { setSelectedModel(model); setFlavorSearch('') }}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Buscar sabor
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Filtrar sabores..."
+                value={flavorSearch}
+                onChange={(e) => setFlavorSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Flavors grid */}
@@ -189,7 +217,9 @@ export default function Sales() {
 
           {getModelFlavors().length === 0 && (
             <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-              <p className="text-gray-500 dark:text-gray-400">No hay sabores para este modelo</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                {flavorSearch ? 'No se encontraron sabores' : 'No hay sabores disponibles para este modelo'}
+              </p>
             </div>
           )}
         </>
