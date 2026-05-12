@@ -11,6 +11,7 @@ import History from './pages/History'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Reservations from './pages/Reservations'
+import Clients from './pages/Clients'
 import Promo from './pages/Promo'
 import './App.css'
 
@@ -68,6 +69,11 @@ function App() {
       <Route path="/reservations" element={
         <ProtectedRoute>
           <Layout><Reservations /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/clients" element={
+        <ProtectedRoute>
+          <Layout><Clients /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/settings" element={

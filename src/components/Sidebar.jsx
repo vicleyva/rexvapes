@@ -14,11 +14,12 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarClock,
-  MessageCircle
+  MessageCircle,
+  Users
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const APP_VERSION = 'v1.4.5'
+const APP_VERSION = 'v1.4.6'
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -26,6 +27,7 @@ const navItems = [
   { path: '/sales', label: 'Vender', icon: ShoppingCart },
   { path: '/reservations', label: 'Reservaciones', icon: CalendarClock },
   { path: '/history', label: 'Historial', icon: History },
+  { path: '/clients', label: 'Clientes', icon: Users },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/promo', label: 'Promo', icon: MessageCircle },
   { path: '/settings', label: 'Configuración', icon: Settings },
