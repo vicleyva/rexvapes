@@ -21,6 +21,20 @@
         }
       }(window.location))
     </script>
+    <!-- Force reload if assets fail to load (cache busting) -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK') {
+          if (!sessionStorage.getItem('reloaded')) {
+            sessionStorage.setItem('reloaded', 'true');
+            location.reload(true);
+          }
+        }
+      }, true);
+      window.addEventListener('load', function() {
+        sessionStorage.removeItem('reloaded');
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
