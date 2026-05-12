@@ -80,7 +80,7 @@ rexvapes/
 ### Key Columns
 
 **models**
-- `id` (UUID), `name`, `puffs`, `price`, `is_active`
+- `id` (UUID), `name`, `puffs`, `price`, `cost`, `is_active`
 
 **flavors**
 - `id` (UUID), `model_id` (FK), `name`, `name_es`, `stock`, `min_stock`, `is_active`
@@ -154,7 +154,7 @@ rm -rf node_modules package-lock.json && npm install
 
 ## Versioning
 
-**Current Version**: `v1.3.6`
+**Current Version**: `v1.4.4`
 
 **Location**: `src/components/Sidebar.jsx` and `src/components/PublicLayout.jsx` → `APP_VERSION` constant
 
@@ -286,6 +286,9 @@ if (l.search[1] === '/' ) {
 13. **Reservations** - Reserve items for future delivery (sale created on payment, not delivery)
 14. **Available Stock** - Stock minus reserved shown across Inventory, Sales, Availability
 15. **History Type Column** - Shows badges for internal use (orange) and discount (green)
+16. **Profit Tracking** - Model cost field enables profit/margin calculations
+17. **Margin Column** - History and Reservations show profit/loss per transaction (green/red)
+18. **Promo Fullscreen** - Escape key exits, responsive mobile layout
 
 ---
 
@@ -376,9 +379,126 @@ const matchesStock = stockFilter === 'all' ||
 | Sidebar (expanded) | 176px (`w-44`) |
 | Sidebar (collapsed) | 56px (`w-14`) |
 | Mobile header | 56px (`w-14`) |
-| Public header | 80px (`w-20`) |
+| Public header | 40px (`w-10`) |
 | Login page | 128px (`w-32`) |
 | Favicon | `index.html` → `./logo.png` |
+
+---
+
+## Profit & Cost Tracking
+
+### Model Cost Field
+
+**Column**: `models.cost` (numeric, nullable)
+
+Stores purchase cost per unit. Used to calculate profit margins.
+
+**Display in Settings**: `Costo: $63 • +$57` (cost and profit per unit)
+
+### Profit Calculation
+
+```javascript
+// Revenue - (Quantity × Model Cost)
+const profit = totalRevenue - (quantity * model.cost)
+```
+
+| Scenario | Revenue | Cost | Margin |
+|----------|---------|------|--------|
+| Normal sale ($120) | $120 | $63 | +$57 (green) |
+| Internal use ($0) | $0 | $63 | -$63 (red) |
+| Discounted ($100) | $100 | $63 | +$37 (green) |
+
+### Where Profit Shows
+
+| Page | What Shows |
+|------|------------|
+| **Reports** | Summary cards: Ventas, Costo, Ganancia, Promedio |
+| **History** | Summary cards + Margen column per sale |
+| **Reservations History** | Margen column per reservation |
+
+### Supabase Query for Cost
+
+```javascript
+// Get sales with model cost via nested join
+const { data } = await supabase
+  .from('sales')
+  .select('*, flavors(model_id, models(cost))')
+
+// Access: sale.flavors?.models?.cost
+```
+
+---
+
+## SaleModal (Client-Facing)
+
+**"Uso interno" button is HIDDEN** - removed from UI so clients don't see internal pricing.
+
+Only "Descuento" button visible for discounts.
+
+Internal use state/logic kept in code for potential future admin features.
+
+---
+
+## RestockModal Auto-Fill
+
+Cost field auto-fills from model's default cost:
+
+```javascript
+useEffect(() => {
+  if (isOpen) {
+    setCost(model?.cost ? model.cost.toString() : '')
+  }
+}, [isOpen, model])
+```
+
+---
+
+## Number Input Steps
+
+| Field | Step | Reason |
+|-------|------|--------|
+| Price | 10 | Typical increments |
+| Cost | 10 | Typical increments |
+| Puffs | 100 | Puff counts are larger numbers |
+
+```html
+<input type="number" step="10" />
+```
+
+---
+
+## Promo Page (Fullscreen Mode)
+
+### Escape Key to Close
+
+```javascript
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && fullscreen) {
+      setFullscreen(false)
+    }
+  }
+  window.addEventListener('keydown', handleKeyDown)
+  return () => window.removeEventListener('keydown', handleKeyDown)
+}, [fullscreen])
+```
+
+### Mobile Responsive
+
+- Layout: `flex-col sm:flex-row` (stacks vertically on mobile)
+- Logo: `h-32 sm:h-80` (smaller on mobile)
+- Gradient selector: `p-1` padding prevents circle clipping
+
+---
+
+## Public Header (Availability Page)
+
+**Thin header** for minimal branding:
+
+| Element | Size |
+|---------|------|
+| Logo | `w-10 h-10` (40px) |
+| Padding | `py-2` (8px) |
 
 ---
 
@@ -391,3 +511,4 @@ const matchesStock = stockFilter === 'all' ||
 - History page defaults to today's date for both from/to filters
 - Dark mode toggle available on: Public pages, Login, Admin layout
 - Cancel sale restores stock automatically
+- Internal use items deduct from profit (show negative margin)
