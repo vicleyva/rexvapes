@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { LogIn, Moon, Sun, LayoutDashboard } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
-const APP_VERSION = 'v1.4.3'
+const APP_VERSION = 'v1.4.4'
 
 export default function PublicLayout({ children }) {
   const { user } = useAuth()
