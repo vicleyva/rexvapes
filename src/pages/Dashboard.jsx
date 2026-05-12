@@ -37,7 +37,7 @@ export default function Dashboard() {
 
       if (flavors) {
         const totalStock = flavors.reduce((sum, f) => sum + f.stock, 0)
-        const lowStock = flavors.filter(f => f.stock > 0 && f.stock <= (f.min_stock || 2))
+        const lowStock = flavors.filter(f => f.stock <= (f.min_stock || 2))
         setStats(prev => ({
           ...prev,
           totalStock,
