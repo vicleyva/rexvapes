@@ -311,10 +311,17 @@ export default function Reservations() {
 
         if (stockError) throw stockError
 
-        // Mark reservation as paid and completed
+        // Mark reservation as paid, delivered (if not already), and completed
+        const now = new Date().toISOString()
         const { error: resError } = await supabase
           .from('reservations')
-          .update({ paid: true, paid_at: new Date().toISOString(), status: 'completed' })
+          .update({
+            paid: true,
+            paid_at: now,
+            delivered: true,
+            delivered_at: reservation.delivered_at || now,  // Keep original delivery time if already delivered
+            status: 'completed'
+          })
           .eq('id', reservation.id)
 
         if (resError) throw resError
