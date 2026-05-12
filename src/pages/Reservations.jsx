@@ -265,17 +265,28 @@ export default function Reservations() {
     }
   }
 
+  // Parse date string as local time (not UTC)
+  const parseLocalDate = (dateStr) => {
+    const [year, month, day] = dateStr.split('-').map(Number)
+    return new Date(year, month - 1, day)
+  }
+
   const isOverdue = (date) => {
-    return new Date(date) < new Date(new Date().toDateString())
+    const deliveryDate = parseLocalDate(date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return deliveryDate < today
   }
 
   const isToday = (date) => {
-    const today = new Date().toDateString()
-    return new Date(date).toDateString() === today
+    const deliveryDate = parseLocalDate(date)
+    const today = new Date()
+    return deliveryDate.toDateString() === today.toDateString()
   }
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('es-MX', {
+    const d = parseLocalDate(date)
+    return d.toLocaleDateString('es-MX', {
       weekday: 'short',
       day: 'numeric',
       month: 'short'
