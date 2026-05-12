@@ -228,6 +228,7 @@ export default function Settings() {
                 <input
                   type="number"
                   placeholder="Puffs"
+                  step="100"
                   value={newModel.puffs}
                   onChange={(e) => setNewModel({ ...newModel, puffs: e.target.value })}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -235,6 +236,7 @@ export default function Settings() {
                 <input
                   type="number"
                   placeholder="Costo compra"
+                  step="10"
                   value={newModel.cost}
                   onChange={(e) => setNewModel({ ...newModel, cost: e.target.value })}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -242,6 +244,7 @@ export default function Settings() {
                 <input
                   type="number"
                   placeholder="Precio venta"
+                  step="10"
                   value={newModel.price}
                   onChange={(e) => setNewModel({ ...newModel, price: e.target.value })}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -281,6 +284,7 @@ export default function Settings() {
                       />
                       <input
                         type="number"
+                        step="100"
                         value={editingModel.puffs || ''}
                         onChange={(e) => setEditingModel({ ...editingModel, puffs: e.target.value ? parseInt(e.target.value) : null })}
                         placeholder="Puffs"
@@ -288,6 +292,7 @@ export default function Settings() {
                       />
                       <input
                         type="number"
+                        step="10"
                         value={editingModel.cost || ''}
                         onChange={(e) => setEditingModel({ ...editingModel, cost: e.target.value ? parseFloat(e.target.value) : null })}
                         placeholder="Costo"
@@ -295,6 +300,7 @@ export default function Settings() {
                       />
                       <input
                         type="number"
+                        step="10"
                         value={editingModel.price}
                         onChange={(e) => setEditingModel({ ...editingModel, price: parseFloat(e.target.value) })}
                         placeholder="Precio"
