@@ -40,21 +40,23 @@ export default function Dashboard() {
   const [models, setModels] = useState({})
   const [flavors, setFlavors] = useState({})
   const [loading, setLoading] = useState(true)
+  const [inventoryLoaded, setInventoryLoaded] = useState(false)
 
   useEffect(() => {
     fetchInventoryData()
   }, [])
 
+  // Fetch sales data when dates change AND inventory is loaded
   useEffect(() => {
-    if (dateFrom && dateTo) {
+    if (dateFrom && dateTo && inventoryLoaded) {
       fetchSalesData()
     }
-  }, [dateFrom, dateTo])
+  }, [dateFrom, dateTo, inventoryLoaded])
 
   const fetchInventoryData = async () => {
     try {
       const [{ data: flavorsData }, { data: modelsData }, { data: reservations }] = await Promise.all([
-        supabase.from('flavors').select('*').eq('is_active', true),
+        supabase.from('flavors').select('*'),
         supabase.from('models').select('*'),
         supabase.from('reservations').select('quantity').eq('status', 'active')
       ])
@@ -68,12 +70,13 @@ export default function Dashboard() {
       setFlavors(flavorsMap)
 
       if (flavorsData) {
-        const totalStock = flavorsData.reduce((sum, f) => sum + f.stock, 0)
-        const lowStock = flavorsData.filter(f => f.stock <= (f.min_stock || 2))
+        const activeFlavors = flavorsData.filter(f => f.is_active)
+        const totalStock = activeFlavors.reduce((sum, f) => sum + f.stock, 0)
+        const lowStock = activeFlavors.filter(f => f.stock <= (f.min_stock || 2))
         setStats(prev => ({
           ...prev,
           totalStock,
-          totalFlavors: flavorsData.length
+          totalFlavors: activeFlavors.length
         }))
         setLowStockItems(lowStock)
       }
@@ -84,6 +87,8 @@ export default function Dashboard() {
           totalReserved: reservations.reduce((sum, r) => sum + r.quantity, 0)
         }))
       }
+
+      setInventoryLoaded(true)
     } catch (error) {
       console.error('Error fetching inventory data:', error)
     }
@@ -92,7 +97,7 @@ export default function Dashboard() {
   const fetchSalesData = async () => {
     setLoading(true)
     try {
-      // Convert dates to start/end of day
+      // Convert dates to start/end of day in local timezone
       const startDate = new Date(dateFrom + 'T00:00:00')
       const endDate = new Date(dateTo + 'T23:59:59')
 
