@@ -8,7 +8,8 @@ import {
   DollarSign,
   TrendingUp,
   Plus,
-  ArrowRight
+  ArrowRight,
+  CalendarClock
 } from 'lucide-react'
 
 export default function Dashboard() {
@@ -17,7 +18,8 @@ export default function Dashboard() {
     totalFlavors: 0,
     todaySales: 0,
     todayRevenue: 0,
-    weekRevenue: 0
+    weekRevenue: 0,
+    totalReserved: 0
   })
   const [lowStockItems, setLowStockItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -42,6 +44,19 @@ export default function Dashboard() {
           totalFlavors: flavors.length
         }))
         setLowStockItems(lowStock)
+      }
+
+      // Fetch active reservations
+      const { data: reservations } = await supabase
+        .from('reservations')
+        .select('quantity')
+        .eq('status', 'pending')
+
+      if (reservations) {
+        setStats(prev => ({
+          ...prev,
+          totalReserved: reservations.reduce((sum, r) => sum + r.quantity, 0)
+        }))
       }
 
       const today = new Date()
@@ -108,7 +123,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -152,6 +167,17 @@ export default function Dashboard() {
           <p className="text-3xl font-bold text-gray-900 dark:text-white">${stats.weekRevenue}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">MXN (7 días)</p>
         </div>
+
+        <Link to="/reservations" className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+              <CalendarClock className="w-5 h-5 text-purple-500 dark:text-purple-400" />
+            </div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Reservado</span>
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalReserved}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">unidades</p>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
