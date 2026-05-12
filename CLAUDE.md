@@ -48,6 +48,7 @@ rexvapes/
 │   │   ├── Inventory.jsx    # Stock management + filters
 │   │   ├── Login.jsx        # Auth page (dark mode)
 │   │   ├── Reports.jsx      # Analytics
+│   │   ├── Reservations.jsx # Reserve items for future delivery
 │   │   ├── Sales.jsx        # Record sales
 │   │   └── Settings.jsx     # Models & flavors config
 │   ├── App.jsx              # Routes + ProtectedRoute
@@ -73,6 +74,8 @@ rexvapes/
 | `flavors` | Flavors per model (stock, min_stock) |
 | `sales` | Sales records (quantity, price, total) |
 | `restocks` | Restock records (quantity, cost) |
+| `cancellations` | Cancelled sales log |
+| `reservations` | Reserved items for future delivery |
 
 ### Key Columns
 
@@ -106,6 +109,7 @@ rexvapes/
 | `/sales` | Sales | Yes |
 | `/history` | History | Yes |
 | `/reports` | Reports | Yes |
+| `/reservations` | Reservations | Yes |
 | `/settings` | Settings | Yes |
 
 ---
@@ -139,9 +143,9 @@ rm -rf node_modules package-lock.json && npm install
 
 ## Versioning
 
-**Current Version**: `v1.0.3`
+**Current Version**: `v1.2.8`
 
-**Location**: `src/components/PublicLayout.jsx` → `APP_VERSION` constant
+**Location**: `src/components/Sidebar.jsx` and `src/components/PublicLayout.jsx` → `APP_VERSION` constant
 
 Displayed on public page header next to Login button. **Bump version on each deploy** to verify deployment.
 
@@ -193,6 +197,24 @@ File: `.github/workflows/deploy.yml`
 - Triggers on push to `master` branch
 - Uses secrets for environment variables
 - Deploys to GitHub Pages
+
+### IMPORTANT: Deployment Process
+
+**Do NOT use `npm run deploy` alone** - it pushes to `gh-pages` branch but GitHub Pages is configured to build from `master` via GitHub Actions.
+
+**Correct deployment:**
+```bash
+# 1. Commit changes to master
+git add -A && git commit -m "Description (vX.X.X)"
+
+# 2. Push to master (triggers workflow)
+git push origin master
+```
+
+The workflow will build and deploy automatically. Check workflow status:
+```bash
+gh run list --limit 1
+```
 
 ### SPA 404 Fix
 
@@ -250,6 +272,9 @@ if (l.search[1] === '/' ) {
 10. **History Date Default** - Defaults to today's date
 11. **Cancel Sale** - X button on History to cancel sale and restore stock
 12. **Version Display** - Shows version on public page to verify deployments
+13. **Reservations** - Reserve items for future delivery (auto-creates sale on delivery)
+14. **Available Stock** - Stock minus reserved shown across Inventory, Sales, Availability
+15. **History Type Column** - Shows badges for internal use (orange) and discount (green)
 
 ---
 
