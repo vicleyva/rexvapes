@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift } from 'lucide-react'
+import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift, DollarSign } from 'lucide-react'
 import Swal from 'sweetalert2'
 
 export default function Reservations() {
@@ -155,20 +155,16 @@ export default function Reservations() {
   }
 
   const handleDeliver = async (reservation) => {
-    const price = reservation.price ?? reservation.flavors?.models?.price ?? 0
-    const total = reservation.quantity * price
-
     const result = await Swal.fire({
-      title: '¿Entregar reservación?',
+      title: '¿Entregar producto?',
       html: `
         <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
         <p>Cliente: <strong>${reservation.customer_name}</strong></p>
-        <p><strong>Total: $${total}</strong></p>
-        <p class="text-sm text-gray-500 mt-2">Se registrará como venta</p>
+        <p class="text-sm text-gray-500 mt-2">El producto se marcará como entregado.<br/>La venta se registra al recibir el pago.</p>
       `,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#10b981',
+      confirmButtonColor: '#3b82f6',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, entregar',
       cancelButtonText: 'Cancelar'
@@ -177,46 +173,24 @@ export default function Reservations() {
     if (!result.isConfirmed) return
 
     try {
-      // Create sale record
-      const { error: saleError } = await supabase
-        .from('sales')
-        .insert({
-          flavor_id: reservation.flavor_id,
-          quantity: reservation.quantity,
-          price: price,
-          total: total,
-          notes: `[RESERVACIÓN] Cliente: ${reservation.customer_name}${reservation.notes ? ' - ' + reservation.notes : ''}`,
-          sold_by: user?.email
-        })
-
-      if (saleError) throw saleError
-
-      // Update stock
-      const newStock = reservation.flavors.stock - reservation.quantity
-      const { error: stockError } = await supabase
-        .from('flavors')
-        .update({ stock: newStock })
-        .eq('id', reservation.flavor_id)
-
-      if (stockError) throw stockError
-
-      // Mark reservation as delivered
-      const { error: resError } = await supabase
+      const { error } = await supabase
         .from('reservations')
-        .update({ status: 'delivered' })
+        .update({ delivered: true })
         .eq('id', reservation.id)
 
-      if (resError) throw resError
+      if (error) throw error
+
+      setReservations(prev => prev.map(r =>
+        r.id === reservation.id ? { ...r, delivered: true } : r
+      ))
 
       Swal.fire({
         icon: 'success',
         title: 'Entregado',
-        text: 'Reservación entregada y venta registrada',
+        text: 'Producto entregado. Marca como pagado para registrar la venta.',
         showConfirmButton: false,
-        timer: 1500
+        timer: 2000
       })
-
-      fetchData()
     } catch (error) {
       console.error('Error delivering reservation:', error)
       Swal.fire({
@@ -262,6 +236,100 @@ export default function Reservations() {
       fetchData()
     } catch (error) {
       console.error('Error cancelling reservation:', error)
+    }
+  }
+
+  const handleTogglePaid = async (reservation) => {
+    const newPaidStatus = !reservation.paid
+
+    // If marking as paid, confirm and create sale
+    if (newPaidStatus) {
+      const price = reservation.price ?? reservation.flavors?.models?.price ?? 0
+      const total = reservation.quantity * price
+
+      const result = await Swal.fire({
+        title: '¿Confirmar pago?',
+        html: `
+          <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
+          <p>Cliente: <strong>${reservation.customer_name}</strong></p>
+          <p class="text-lg font-bold text-green-600 mt-2">Total: $${total}</p>
+          <p class="text-sm text-gray-500 mt-2">Se registrará la venta y se descontará del stock.</p>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Confirmar pago',
+        cancelButtonText: 'Cancelar'
+      })
+
+      if (!result.isConfirmed) return
+
+      try {
+        // Create sale record
+        const { error: saleError } = await supabase
+          .from('sales')
+          .insert({
+            flavor_id: reservation.flavor_id,
+            quantity: reservation.quantity,
+            price: price,
+            total: total,
+            notes: `[RESERVACIÓN] Cliente: ${reservation.customer_name}${reservation.notes ? ' - ' + reservation.notes : ''}`,
+            sold_by: user?.email
+          })
+
+        if (saleError) throw saleError
+
+        // Update stock
+        const newStock = reservation.flavors.stock - reservation.quantity
+        const { error: stockError } = await supabase
+          .from('flavors')
+          .update({ stock: newStock })
+          .eq('id', reservation.flavor_id)
+
+        if (stockError) throw stockError
+
+        // Mark reservation as paid and completed
+        const { error: resError } = await supabase
+          .from('reservations')
+          .update({ paid: true, status: 'completed' })
+          .eq('id', reservation.id)
+
+        if (resError) throw resError
+
+        Swal.fire({
+          icon: 'success',
+          title: '¡Pago recibido!',
+          text: 'Venta registrada correctamente',
+          showConfirmButton: false,
+          timer: 1500
+        })
+
+        fetchData()
+      } catch (error) {
+        console.error('Error processing payment:', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo procesar el pago'
+        })
+      }
+    } else {
+      // Just removing paid status (shouldn't happen often since completed reservations are hidden)
+      try {
+        const { error } = await supabase
+          .from('reservations')
+          .update({ paid: false })
+          .eq('id', reservation.id)
+
+        if (error) throw error
+
+        setReservations(prev => prev.map(r =>
+          r.id === reservation.id ? { ...r, paid: false } : r
+        ))
+      } catch (error) {
+        console.error('Error toggling paid status:', error)
+      }
     }
   }
 
@@ -389,6 +457,16 @@ export default function Reservations() {
                     <span className={`font-bold shrink-0 ${reservation.price === 0 ? 'text-orange-500 dark:text-orange-400' : reservation.price < (reservation.flavors?.models?.price || 0) ? 'text-green-500 dark:text-green-400' : 'text-blue-500 dark:text-blue-400'}`}>
                       ${reservation.quantity * (reservation.price ?? reservation.flavors?.models?.price ?? 0)}
                     </span>
+                    {reservation.delivered && (
+                      <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 text-xs font-medium px-2 py-0.5 rounded">
+                        Entregado
+                      </span>
+                    )}
+                    {reservation.paid && (
+                      <span className="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 text-xs font-medium px-2 py-0.5 rounded">
+                        Pagado
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
@@ -417,9 +495,25 @@ export default function Reservations() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
+                    onClick={() => handleTogglePaid(reservation)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      reservation.paid
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                    title={reservation.paid ? 'Quitar pago' : 'Marcar pagado'}
+                  >
+                    <DollarSign className="w-5 h-5" />
+                  </button>
+                  <button
                     onClick={() => handleDeliver(reservation)}
-                    className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
-                    title="Entregar"
+                    disabled={reservation.delivered}
+                    className={`p-2 rounded-lg transition-colors ${
+                      reservation.delivered
+                        ? 'bg-blue-500 text-white cursor-default'
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50'
+                    }`}
+                    title={reservation.delivered ? 'Ya entregado' : 'Entregar'}
                   >
                     <Check className="w-5 h-5" />
                   </button>

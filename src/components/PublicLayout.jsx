@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { LogIn, Moon, Sun } from 'lucide-react'
+import { LogIn, Moon, Sun, LayoutDashboard } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
-const APP_VERSION = 'v1.2.12'
+const APP_VERSION = 'v1.3.0'
 
 export default function PublicLayout({ children }) {
+  const { user } = useAuth()
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('rexvapes_darkmode')
     return saved === 'true'
@@ -40,13 +42,23 @@ export default function PublicLayout({ children }) {
               )}
             </button>
             <span className="text-xs text-gray-400 dark:text-gray-500">{APP_VERSION}</span>
-            <Link
-              to="/login"
-              className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-            >
-              <LogIn className="w-4 h-4" />
-              Login
-            </Link>
+            {user ? (
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-1 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+              >
+                <LogIn className="w-4 h-4" />
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </header>
