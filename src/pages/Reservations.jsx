@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift, DollarSign, History } from 'lucide-react'
+import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift, DollarSign, History, RotateCcw } from 'lucide-react'
 import Swal from 'sweetalert2'
 import ClientSelector from '../components/ClientSelector'
 
@@ -198,6 +198,55 @@ export default function Reservations() {
   }
 
   const handleDeliver = async (reservation) => {
+    // If already delivered, ask to undo
+    if (reservation.delivered) {
+      const clientName = reservation.clients?.name || reservation.customer_name || 'Sin cliente'
+      const result = await Swal.fire({
+        title: '¿Deshacer entrega?',
+        html: `
+          <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
+          <p>Cliente: <strong>${clientName}</strong></p>
+          <p class="text-sm text-gray-500 mt-2">Se quitará la marca de entregado.</p>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, deshacer',
+        cancelButtonText: 'No'
+      })
+
+      if (!result.isConfirmed) return
+
+      try {
+        const { error } = await supabase
+          .from('reservations')
+          .update({ delivered: false, delivered_at: null })
+          .eq('id', reservation.id)
+
+        if (error) throw error
+
+        setReservations(prev => prev.map(r =>
+          r.id === reservation.id ? { ...r, delivered: false, delivered_at: null } : r
+        ))
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Entrega deshecha',
+          showConfirmButton: false,
+          timer: 1500
+        })
+      } catch (error) {
+        console.error('Error undoing delivery:', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo deshacer la entrega'
+        })
+      }
+      return
+    }
+
     const clientName = reservation.clients?.name || reservation.customer_name || 'Sin cliente'
     const result = await Swal.fire({
       title: '¿Entregar producto?',
@@ -420,6 +469,59 @@ export default function Reservations() {
     return deliveryDate.toDateString() === today.toDateString()
   }
 
+  const handleReactivate = async (reservation) => {
+    const clientName = reservation.clients?.name || reservation.customer_name || 'Sin cliente'
+    const result = await Swal.fire({
+      title: '¿Reactivar reservación?',
+      html: `
+        <p><strong>${reservation.quantity}x</strong> ${reservation.flavors?.name}</p>
+        <p>Cliente: <strong>${clientName}</strong></p>
+        <p class="text-sm text-gray-500 mt-2">La reservación volverá a estar activa.</p>
+        <p class="text-sm text-orange-500 mt-1"><strong>Nota:</strong> Si ya cancelaste la venta, esto solo reactiva la reservación.</p>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, reactivar',
+      cancelButtonText: 'No'
+    })
+
+    if (!result.isConfirmed) return
+
+    try {
+      const { error } = await supabase
+        .from('reservations')
+        .update({
+          status: 'active',
+          paid: false,
+          paid_at: null,
+          delivered: false,
+          delivered_at: null
+        })
+        .eq('id', reservation.id)
+
+      if (error) throw error
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Reactivada',
+        text: 'La reservación está activa nuevamente',
+        showConfirmButton: false,
+        timer: 1500
+      })
+
+      fetchData()
+    } catch (error) {
+      console.error('Error reactivating reservation:', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo reactivar la reservación'
+      })
+    }
+  }
+
   const formatDate = (date) => {
     const d = parseLocalDate(date)
     return d.toLocaleDateString('es-MX', {
@@ -600,13 +702,12 @@ export default function Reservations() {
                   </button>
                   <button
                     onClick={() => handleDeliver(reservation)}
-                    disabled={reservation.delivered}
                     className={`p-2 rounded-lg transition-colors ${
                       reservation.delivered
-                        ? 'bg-blue-500 text-white cursor-default'
+                        ? 'bg-blue-500 text-white hover:bg-blue-600'
                         : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50'
                     }`}
-                    title={reservation.delivered ? 'Ya entregado' : 'Entregar'}
+                    title={reservation.delivered ? 'Deshacer entrega' : 'Entregar'}
                   >
                     <Check className="w-5 h-5" />
                   </button>
@@ -645,6 +746,7 @@ export default function Reservations() {
                       <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Margen</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Pagado</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -679,6 +781,15 @@ export default function Reservations() {
                         </td>
                         <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400 font-medium">
                           {formatDateTime(r.paid_at)}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => handleReactivate(r)}
+                            className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                            title="Reactivar reservación"
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
