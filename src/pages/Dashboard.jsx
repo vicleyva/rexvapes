@@ -50,7 +50,7 @@ export default function Dashboard() {
       const { data: reservations } = await supabase
         .from('reservations')
         .select('quantity')
-        .eq('status', 'pending')
+        .eq('status', 'active')
 
       if (reservations) {
         setStats(prev => ({
