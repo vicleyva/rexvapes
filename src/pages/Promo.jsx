@@ -88,12 +88,6 @@ export default function Promo() {
       lines.push(`• ${name}`)
     })
 
-    lines.push('')
-    lines.push('📍 Monterrey, NL')
-    lines.push('📲 Envíos y entregas')
-    lines.push('')
-    lines.push('¡Escríbenos! 💬')
-
     return lines.join('\n')
   }
 
