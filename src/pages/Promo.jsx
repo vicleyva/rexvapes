@@ -190,8 +190,8 @@ export default function Promo() {
           <div className="space-y-4">
             {/* Gradient selector + Fullscreen button */}
             <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Palette className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <div className="flex items-center gap-2 flex-wrap p-1">
+                <Palette className="w-4 h-4 text-gray-500 dark:text-gray-400 ml-1" />
                 {GRADIENTS.map(g => (
                   <button
                     key={g.id}
