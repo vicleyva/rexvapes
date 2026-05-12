@@ -135,53 +135,45 @@ export default function Promo() {
         </button>
       </div>
 
-      {/* Model selector */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-4 shrink-0">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Selecciona modelo
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {/* Model selector + Tabs row */}
+      <div className="flex items-center gap-4 mb-4 shrink-0 flex-wrap">
+        <select
+          value={selectedModel?.id || ''}
+          onChange={(e) => setSelectedModel(models.find(m => m.id === e.target.value))}
+          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium"
+        >
           {models.map(model => (
-            <button
-              key={model.id}
-              onClick={() => setSelectedModel(model)}
-              className={`p-3 rounded-lg border-2 text-left transition-all ${
-                selectedModel?.id === model.id
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900/30'
-                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-              }`}
-            >
-              <p className="font-semibold text-gray-900 dark:text-white text-sm">{model.name}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">${model.price}</p>
-            </button>
+            <option key={model.id} value={model.id}>
+              {model.name} - ${model.price}
+            </option>
           ))}
-        </div>
-      </div>
+        </select>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-4 shrink-0">
-        <button
-          onClick={() => setActiveTab('visual')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-            activeTab === 'visual'
-              ? 'bg-purple-500 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          <Image className="w-4 h-4" />
-          Visual
-        </button>
-        <button
-          onClick={() => setActiveTab('text')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-            activeTab === 'text'
-              ? 'bg-green-500 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          <FileText className="w-4 h-4" />
-          Texto
-        </button>
+        {/* Tabs */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('visual')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+              activeTab === 'visual'
+                ? 'bg-purple-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <Image className="w-4 h-4" />
+            Visual
+          </button>
+          <button
+            onClick={() => setActiveTab('text')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+              activeTab === 'text'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            Texto
+          </button>
+        </div>
       </div>
 
       {/* Tab content */}
