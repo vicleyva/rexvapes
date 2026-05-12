@@ -28,9 +28,10 @@ export default function FlavorCard({ flavor, onAdjust, showControls = true, rese
             {available}
           </span>
           {reserved > 0 && (
-            <span className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-              ({reserved} res.)
-            </span>
+            <div className="text-xs mt-1 text-right">
+              <span className="text-gray-500 dark:text-gray-400">Stock: {flavor.stock}</span>
+              <span className="text-orange-600 dark:text-orange-400 ml-1">| Res: {reserved}</span>
+            </div>
           )}
         </div>
       </div>
