@@ -189,9 +189,9 @@ export default function Inventory() {
       </div>
 
       {filteredFlavors.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-fr">
           {filteredFlavors.map(flavor => (
-            <div key={flavor.id} className="relative group">
+            <div key={flavor.id} className="relative group h-full">
               <FlavorCard
                 flavor={flavor}
                 onAdjust={handleAdjust}

@@ -15,44 +15,44 @@ export default function FlavorCard({ flavor, onAdjust, showControls = true, rese
   }
 
   return (
-    <div className={`rounded-xl border-2 p-4 transition-all hover:shadow-md ${getStockColor(available)}`}>
-      <div className="flex items-start justify-between mb-2">
+    <div className={`rounded-xl border-2 p-3 transition-all hover:shadow-md h-full flex flex-col ${getStockColor(available)}`}>
+      <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 dark:text-white truncate">{flavor.name}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white truncate text-sm">{flavor.name}</h3>
           {flavor.name_es && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{flavor.name_es}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{flavor.name_es}</p>
           )}
         </div>
-        <span className={`${getStockBadge(available)} text-white text-sm font-bold px-2 py-1 rounded-full ml-2`}>
+        <span className={`${getStockBadge(available)} text-white text-xs font-bold px-2 py-0.5 rounded-full shrink-0`}>
           {available}
         </span>
       </div>
 
       {showControls && (
-        <>
+        <div className="mt-auto pt-2">
           {reserved > 0 && (
-            <div className="text-xs text-center mt-2">
+            <div className="text-xs text-center mb-1">
               <span className="text-gray-500 dark:text-gray-400">Stock: {flavor.stock}</span>
               <span className="text-orange-600 dark:text-orange-400 ml-1">| Res: {reserved}</span>
             </div>
           )}
-          <div className="flex items-center justify-center gap-2 mt-2">
-          <button
-            onClick={() => onAdjust(flavor.id, -1)}
-            disabled={available === 0}
-            className="p-2 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-          <span className="font-mono text-lg font-bold w-8 text-center">{available}</span>
-          <button
-            onClick={() => onAdjust(flavor.id, 1)}
-            className="p-2 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
+          <div className="flex items-center justify-center gap-1">
+            <button
+              onClick={() => onAdjust(flavor.id, -1)}
+              disabled={available === 0}
+              className="p-1.5 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Minus className="w-3 h-3" />
+            </button>
+            <span className="font-mono text-sm font-bold w-6 text-center">{available}</span>
+            <button
+              onClick={() => onAdjust(flavor.id, 1)}
+              className="p-1.5 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 transition-colors"
+            >
+              <Plus className="w-3 h-3" />
+            </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   )
