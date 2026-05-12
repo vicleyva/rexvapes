@@ -404,8 +404,8 @@ export default function History() {
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Sabor</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Margen</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Tipo</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Usuario</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cancelar</th>
                   </tr>
                 </thead>
@@ -433,6 +433,18 @@ export default function History() {
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                           ${sale.total}
+                        </td>
+                        <td className="px-4 py-3 text-right text-sm font-semibold">
+                          {(() => {
+                            const total = parseFloat(sale.total)
+                            const cost = sale.quantity * (model?.cost || 0)
+                            const margin = total - cost
+                            return (
+                              <span className={margin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                                {margin >= 0 ? '+' : ''}{margin.toFixed(0)}
+                              </span>
+                            )
+                          })()}
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex flex-wrap gap-1 justify-center">
