@@ -302,8 +302,22 @@ export default function Reservations() {
 
         if (saleError) throw saleError
 
+        // Fetch current stock to avoid race conditions
+        const { data: currentFlavor, error: fetchError } = await supabase
+          .from('flavors')
+          .select('stock')
+          .eq('id', reservation.flavor_id)
+          .single()
+
+        if (fetchError) throw fetchError
+
+        // Check stock is sufficient (shouldn't happen, but safety check)
+        if (currentFlavor.stock < reservation.quantity) {
+          throw new Error(`Stock insuficiente. Disponible: ${currentFlavor.stock}`)
+        }
+
         // Update stock
-        const newStock = reservation.flavors.stock - reservation.quantity
+        const newStock = currentFlavor.stock - reservation.quantity
         const { error: stockError } = await supabase
           .from('flavors')
           .update({ stock: newStock })
