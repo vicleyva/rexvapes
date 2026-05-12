@@ -13,8 +13,8 @@ export default function History() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('sales') // 'sales' or 'cancellations'
 
-  // Default to today's date
-  const today = new Date().toISOString().split('T')[0]
+  // Default to today's date (local timezone)
+  const today = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD format
   const [dateFrom, setDateFrom] = useState(today)
   const [dateTo, setDateTo] = useState(today)
   const [filterModel, setFilterModel] = useState('')
