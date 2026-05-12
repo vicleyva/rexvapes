@@ -98,6 +98,12 @@ export default function History() {
 
   const totalRevenue = filteredSales.reduce((sum, s) => sum + parseFloat(s.total), 0)
   const totalUnits = filteredSales.reduce((sum, s) => sum + s.quantity, 0)
+  const totalCosts = filteredSales.reduce((sum, s) => {
+    const flavor = flavors[s.flavor_id]
+    const model = flavor ? models[flavor.model_id] : null
+    return sum + (s.quantity * (model?.cost || 0))
+  }, 0)
+  const totalProfit = totalRevenue - totalCosts
   const totalCancelledRevenue = filteredCancellations.reduce((sum, c) => sum + parseFloat(c.total), 0)
   const totalCancelledUnits = filteredCancellations.reduce((sum, c) => sum + c.quantity, 0)
 
@@ -368,14 +374,24 @@ export default function History() {
 
       {/* Summary */}
       {activeTab === 'sales' ? (
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4">
-            <p className="text-sm text-blue-500 dark:text-blue-400 font-medium">Total Vendido</p>
-            <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">{totalUnits} unidades</p>
+            <p className="text-sm text-blue-500 dark:text-blue-400 font-medium">Unidades</p>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">{totalUnits}</p>
           </div>
           <div className="bg-green-50 dark:bg-green-900/30 rounded-xl p-4">
-            <p className="text-sm text-green-600 dark:text-green-400 font-medium">Ingresos</p>
-            <p className="text-2xl font-bold text-green-700 dark:text-green-300">${totalRevenue.toFixed(2)} MXN</p>
+            <p className="text-sm text-green-600 dark:text-green-400 font-medium">Ventas</p>
+            <p className="text-2xl font-bold text-green-700 dark:text-green-300">${totalRevenue.toFixed(0)}</p>
+          </div>
+          <div className="bg-red-50 dark:bg-red-900/30 rounded-xl p-4">
+            <p className="text-sm text-red-500 dark:text-red-400 font-medium">Costo</p>
+            <p className="text-2xl font-bold text-red-600 dark:text-red-300">${totalCosts.toFixed(0)}</p>
+          </div>
+          <div className={`rounded-xl p-4 ${totalProfit >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/30' : 'bg-red-50 dark:bg-red-900/30'}`}>
+            <p className={`text-sm font-medium ${totalProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>Ganancia</p>
+            <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-600 dark:text-red-300'}`}>
+              {totalProfit >= 0 ? '' : '-'}${Math.abs(totalProfit).toFixed(0)}
+            </p>
           </div>
         </div>
       ) : (
