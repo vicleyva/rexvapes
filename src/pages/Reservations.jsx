@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift, DollarSign } from 'lucide-react'
+import { CalendarClock, Plus, Package, Check, X, Trash2, Clock, AlertCircle, Tag, Gift, DollarSign, History } from 'lucide-react'
 import Swal from 'sweetalert2'
 
 export default function Reservations() {
   const { user } = useAuth()
   const [reservations, setReservations] = useState([])
+  const [completedReservations, setCompletedReservations] = useState([])
   const [models, setModels] = useState([])
   const [flavors, setFlavors] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
 
   // Form state
   const [selectedModel, setSelectedModel] = useState('')
@@ -29,7 +31,7 @@ export default function Reservations() {
 
   const fetchData = async () => {
     try {
-      const [{ data: reservationsData }, { data: modelsData }, { data: flavorsData }] = await Promise.all([
+      const [{ data: reservationsData }, { data: completedData }, { data: modelsData }, { data: flavorsData }] = await Promise.all([
         supabase
           .from('reservations')
           .select(`
@@ -49,11 +51,31 @@ export default function Reservations() {
           `)
           .eq('status', 'active')
           .order('delivery_date', { ascending: true }),
+        supabase
+          .from('reservations')
+          .select(`
+            *,
+            flavors (
+              id,
+              name,
+              name_es,
+              model_id,
+              models (
+                id,
+                name,
+                price
+              )
+            )
+          `)
+          .eq('status', 'completed')
+          .order('paid_at', { ascending: false })
+          .limit(50),
         supabase.from('models').select('*').eq('is_active', true).order('name'),
         supabase.from('flavors').select('*').eq('is_active', true).order('name')
       ])
 
       setReservations(reservationsData || [])
+      setCompletedReservations(completedData || [])
       setModels(modelsData || [])
       setFlavors(flavorsData || [])
     } catch (error) {
@@ -175,7 +197,7 @@ export default function Reservations() {
     try {
       const { error } = await supabase
         .from('reservations')
-        .update({ delivered: true })
+        .update({ delivered: true, delivered_at: new Date().toISOString() })
         .eq('id', reservation.id)
 
       if (error) throw error
@@ -292,7 +314,7 @@ export default function Reservations() {
         // Mark reservation as paid and completed
         const { error: resError } = await supabase
           .from('reservations')
-          .update({ paid: true, status: 'completed' })
+          .update({ paid: true, paid_at: new Date().toISOString(), status: 'completed' })
           .eq('id', reservation.id)
 
         if (resError) throw resError
@@ -361,6 +383,17 @@ export default function Reservations() {
     })
   }
 
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return '-'
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -373,13 +406,26 @@ export default function Reservations() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Reservaciones</h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          Reservar
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors ${
+              showHistory
+                ? 'bg-purple-500 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <History className="w-5 h-5" />
+            Historial
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Reservar
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -528,6 +574,63 @@ export default function Reservations() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Completed Reservations History */}
+      {showHistory && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Historial de Reservaciones</h2>
+          {completedReservations.length === 0 ? (
+            <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+              <History className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+              <p className="text-gray-500 dark:text-gray-400">No hay reservaciones completadas</p>
+            </div>
+          ) : (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Cliente</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Producto</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-white">Cant.</th>
+                      <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">Total</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Entregado</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Pagado</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                    {completedReservations.map(r => (
+                      <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                          {r.customer_name}
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-sm text-gray-900 dark:text-white">{r.flavors?.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{r.flavors?.models?.name}</p>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-sm font-medium px-2 py-1 rounded">
+                            {r.quantity}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
+                          ${r.quantity * (r.price ?? r.flavors?.models?.price ?? 0)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                          {formatDateTime(r.delivered_at)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-green-600 dark:text-green-400 font-medium">
+                          {formatDateTime(r.paid_at)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
