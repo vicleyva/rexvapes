@@ -13,7 +13,8 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  CalendarClock
+  CalendarClock,
+  MessageCircle
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
@@ -26,6 +27,7 @@ const navItems = [
   { path: '/reservations', label: 'Reservaciones', icon: CalendarClock },
   { path: '/history', label: 'Historial', icon: History },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
+  { path: '/promo', label: 'Promo', icon: MessageCircle },
   { path: '/settings', label: 'Configuración', icon: Settings },
 ]
 

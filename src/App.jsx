@@ -11,6 +11,7 @@ import History from './pages/History'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Reservations from './pages/Reservations'
+import Promo from './pages/Promo'
 import './App.css'
 
 function ProtectedRoute({ children }) {
@@ -72,6 +73,11 @@ function App() {
       <Route path="/settings" element={
         <ProtectedRoute>
           <Layout><Settings /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/promo" element={
+        <ProtectedRoute>
+          <Layout><Promo /></Layout>
         </ProtectedRoute>
       } />
 
