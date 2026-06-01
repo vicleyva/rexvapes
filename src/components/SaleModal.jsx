@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, ShoppingCart, Minus, Plus, Tag } from 'lucide-react'
+import { X, ShoppingCart, Minus, Plus, Tag, Gift } from 'lucide-react'
 import ClientSelector from './ClientSelector'
 
 export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm }) {
@@ -113,6 +113,21 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
 
           {/* Price options */}
           <div className="flex gap-2">
+            {/* Internal use toggle */}
+            <button
+              type="button"
+              onClick={handleInternalUseToggle}
+              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                isInternalUse
+                  ? 'bg-orange-50 dark:bg-orange-900/30 border-orange-300 dark:border-orange-600'
+                  : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+              }`}
+            >
+              <Gift className={`w-5 h-5 ${isInternalUse ? 'text-orange-500' : 'text-gray-400'}`} />
+              <span className={`font-medium text-sm ${isInternalUse ? 'text-orange-700 dark:text-orange-300' : 'text-gray-700 dark:text-gray-300'}`}>
+                Uso interno
+              </span>
+            </button>
             {/* Custom price toggle */}
             <button
               type="button"
@@ -158,10 +173,10 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
             </div>
           )}
 
-          <div className={`rounded-xl p-4 ${isCustomPrice ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'}`}>
+          <div className={`rounded-xl p-4 ${isInternalUse ? 'bg-orange-50 dark:bg-orange-900/20' : isCustomPrice ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'}`}>
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
               <span>Precio unitario:</span>
-              <span className={isCustomPrice ? 'line-through' : ''}>${model.price} MXN</span>
+              <span className={isInternalUse || isCustomPrice ? 'line-through' : ''}>${model.price} MXN</span>
             </div>
             {isCustomPrice && (
               <div className="flex justify-between text-sm mb-1">
@@ -171,7 +186,7 @@ export default function SaleModal({ isOpen, onClose, flavor, model, onConfirm })
             )}
             <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-white">
               <span>Total:</span>
-              <span className={isCustomPrice ? 'text-green-500 dark:text-green-400' : 'text-blue-500 dark:text-blue-400'}>
+              <span className={isInternalUse ? 'text-orange-500 dark:text-orange-400' : isCustomPrice ? 'text-green-500 dark:text-green-400' : 'text-blue-500 dark:text-blue-400'}>
                 ${total} MXN
               </span>
             </div>
