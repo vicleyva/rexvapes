@@ -97,7 +97,10 @@ rexvapes/
 - `id` (UUID), `flavor_id` (FK), `quantity`, `cost`, `restocked_at`, `notes`
 
 **reservations**
-- `id` (UUID), `flavor_id` (FK), `client_id` (FK), `quantity`, `price`, `delivery_date`, `status`, `notes`
+- `id` (UUID), `flavor_id` (FK), `client_id` (FK), `quantity`, `price`, `delivery_date`, `notes`, `reserved_by`
+- `status` (TEXT, default 'active', CHECK: 'active'|'completed'|'cancelled')
+- `delivered` (BOOLEAN, default false), `delivered_at` (TIMESTAMPTZ)
+- `paid` (BOOLEAN, default false), `paid_at` (TIMESTAMPTZ)
 
 ### Row Level Security
 
@@ -499,13 +502,15 @@ const { data } = await supabase
 
 ---
 
-## SaleModal (Client-Facing)
+## SaleModal
 
-**"Uso interno" button is HIDDEN** - removed from UI so clients don't see internal pricing.
+Used only on the authenticated `/sales` page (not public/client-facing).
 
-Only "Descuento" button visible for discounts.
+Shows two mutually-exclusive price toggles:
+- **"Uso interno"** (orange, Gift icon) — sets price to $0, prefixes notes with `[USO INTERNO]`
+- **"Descuento"** (green, Tag icon) — custom discounted price, prefixes notes with `[DESCUENTO -$X]`
 
-Internal use state/logic kept in code for potential future admin features.
+Mirrors the toggle pair in the Reservations modal.
 
 ---
 
