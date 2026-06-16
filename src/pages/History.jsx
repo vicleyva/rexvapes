@@ -19,8 +19,11 @@ export default function History() {
   weekAgo.setDate(weekAgo.getDate() - 7)
   const [dateFrom, setDateFrom] = useState(weekAgo.toLocaleDateString('en-CA'))
   const [dateTo, setDateTo] = useState(today.toLocaleDateString('en-CA'))
+  const [minDate, setMinDate] = useState('')
   const [filterModel, setFilterModel] = useState('')
   const [filterFlavor, setFilterFlavor] = useState('')
+
+  const maxDate = today.toLocaleDateString('en-CA')
 
   useEffect(() => {
     fetchData()
@@ -63,6 +66,18 @@ export default function History() {
         .limit(100)
 
       setCancellations(cancellationsData || [])
+
+      // Earliest sale date = minimum selectable date
+      const { data: firstSale } = await supabase
+        .from('sales')
+        .select('sold_at')
+        .order('sold_at', { ascending: true })
+        .limit(1)
+        .single()
+
+      if (firstSale?.sold_at) {
+        setMinDate(new Date(firstSale.sold_at).toLocaleDateString('en-CA'))
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -291,6 +306,8 @@ export default function History() {
             <input
               type="date"
               value={dateFrom}
+              min={minDate || undefined}
+              max={dateTo || maxDate}
               onChange={(e) => setDateFrom(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -303,6 +320,8 @@ export default function History() {
             <input
               type="date"
               value={dateTo}
+              min={dateFrom || minDate || undefined}
+              max={maxDate}
               onChange={(e) => setDateTo(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

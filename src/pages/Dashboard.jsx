@@ -22,6 +22,9 @@ export default function Dashboard() {
 
   const [dateFrom, setDateFrom] = useState(weekAgo.toLocaleDateString('en-CA'))
   const [dateTo, setDateTo] = useState(today.toLocaleDateString('en-CA'))
+  const [minDate, setMinDate] = useState('')
+
+  const maxDate = today.toLocaleDateString('en-CA')
 
   const [stats, setStats] = useState({
     totalStock: 0,
@@ -86,6 +89,18 @@ export default function Dashboard() {
           ...prev,
           totalReserved: reservations.reduce((sum, r) => sum + r.quantity, 0)
         }))
+      }
+
+      // Earliest sale date = minimum selectable date
+      const { data: firstSale } = await supabase
+        .from('sales')
+        .select('sold_at')
+        .order('sold_at', { ascending: true })
+        .limit(1)
+        .single()
+
+      if (firstSale?.sold_at) {
+        setMinDate(new Date(firstSale.sold_at).toLocaleDateString('en-CA'))
       }
 
       setInventoryLoaded(true)
@@ -211,6 +226,8 @@ export default function Dashboard() {
             <input
               type="date"
               value={dateFrom}
+              min={minDate || undefined}
+              max={dateTo || maxDate}
               onChange={(e) => setDateFrom(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -223,6 +240,8 @@ export default function Dashboard() {
             <input
               type="date"
               value={dateTo}
+              min={dateFrom || minDate || undefined}
+              max={maxDate}
               onChange={(e) => setDateTo(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
