@@ -23,8 +23,7 @@ export default function Dashboard() {
   const [dateFrom, setDateFrom] = useState(weekAgo.toLocaleDateString('en-CA'))
   const [dateTo, setDateTo] = useState(today.toLocaleDateString('en-CA'))
   const [minDate, setMinDate] = useState('')
-
-  const maxDate = today.toLocaleDateString('en-CA')
+  const [activeRange, setActiveRange] = useState('7')
 
   const [stats, setStats] = useState({
     totalStock: 0,
@@ -186,12 +185,27 @@ export default function Dashboard() {
     }
   }
 
-  const setQuickRange = (days) => {
+  const applyRange = (key) => {
+    setActiveRange(key)
     const end = new Date()
+    if (key === 'all') {
+      setDateFrom(minDate || end.toLocaleDateString('en-CA'))
+      setDateTo(end.toLocaleDateString('en-CA'))
+      return
+    }
+    const days = key === 'today' ? 0 : Number(key)
     const start = new Date()
     start.setDate(start.getDate() - days)
     setDateFrom(start.toLocaleDateString('en-CA'))
     setDateTo(end.toLocaleDateString('en-CA'))
+  }
+
+  const formatRangeLabel = (dateStr) => {
+    if (!dateStr) return ''
+    const [year, month, day] = dateStr.split('-').map(Number)
+    return new Date(year, month - 1, day).toLocaleDateString('es-MX', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    })
   }
 
   const formatDate = (dateStr) => {
@@ -217,40 +231,36 @@ export default function Dashboard() {
 
       {/* Date Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6">
-        <div className="flex flex-wrap items-end gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              <Calendar className="w-4 h-4 inline mr-1" />
-              Desde
-            </label>
-            <input
-              type="date"
-              value={dateFrom}
-              min={minDate || undefined}
-              max={dateTo || maxDate}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Calendar className="w-4 h-4" />
+            Periodo:
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: 'today', label: 'Hoy' },
+              { key: '7', label: '7 días' },
+              { key: '30', label: '30 días' },
+              { key: 'all', label: 'Todo' },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => applyRange(key)}
+                className={`px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
+                  activeRange === key
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              <Calendar className="w-4 h-4 inline mr-1" />
-              Hasta
-            </label>
-            <input
-              type="date"
-              value={dateTo}
-              min={dateFrom || minDate || undefined}
-              max={maxDate}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setQuickRange(0)} className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">Hoy</button>
-            <button onClick={() => setQuickRange(7)} className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">7 días</button>
-            <button onClick={() => setQuickRange(30)} className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">30 días</button>
-          </div>
+          <span className="text-sm text-gray-500 dark:text-gray-400 sm:ml-auto">
+            {dateFrom === dateTo
+              ? formatRangeLabel(dateFrom)
+              : `${formatRangeLabel(dateFrom)} – ${formatRangeLabel(dateTo)}`}
+          </span>
         </div>
       </div>
 
