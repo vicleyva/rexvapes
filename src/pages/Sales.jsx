@@ -50,6 +50,7 @@ export default function Sales() {
         .from('sales')
         .insert({
           flavor_id: saleData.flavor_id,
+          client_id: saleData.client_id,
           quantity: saleData.quantity,
           price: saleData.price,
           total: saleData.total,
